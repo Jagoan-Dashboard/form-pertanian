@@ -89,7 +89,7 @@ export default function KomoditasView() {
         <Button
           onClick={() => navigate("/data-komoditas")}
           disabled={!selectedKomoditas}
-          className="bg-green-600 hover:bg-green-700 text-white font-semibold py-6 px-10 rounded-xl transition-all duration-200 shadow-lg flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="bg-green-600 cursor-pointer hover:bg-green-700 text-white font-semibold py-6 px-10 rounded-xl transition-all duration-200 shadow-lg flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
         >
           Selanjutnya
           <Icon icon="material-symbols:chevron-right" className="w-5 h-5" />

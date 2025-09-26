@@ -4,10 +4,11 @@ import { Button } from "~/components/ui/button";
 import { Label } from "~/components/ui/label";
 import { Textarea } from "~/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "~/components/ui/select";
-import { useStepStore } from "~/store/stepStore";
+import { useNavigate } from "react-router";
 
 export default function AspirasiTaniView() {
-  const { prevStep, nextStep } = useStepStore();
+
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     kendalaUtama: '',
     harapan: '',
@@ -169,7 +170,7 @@ export default function AspirasiTaniView() {
         {/* Action Buttons */}
         <div className="flex flex-col sm:flex-row justify-end mt-5 gap-3">
           <Button
-            onClick={prevStep}
+            onClick={() => navigate("/data-komoditas")}
             variant="outline"
             className="sm:w-auto w-full border-green-600 text-green-600 hover:bg-green-50 font-semibold py-6 px-10 rounded-xl transition-all duration-200"
           >

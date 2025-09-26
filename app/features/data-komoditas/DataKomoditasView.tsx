@@ -10,11 +10,12 @@ import { cn } from "~/lib/utils";
 import { id as idLocale } from "date-fns/locale/id";
 import { Calendar } from "~/components/ui/calendar";
 import { CalendarIcon } from "lucide-react";
-
+import { useNavigate } from "react-router";
 // Drag & Drop Upload Component
 function ImageUpload() {
   const [isDragging, setIsDragging] = useState(false);
   const [preview, setPreview] = useState<string | null>(null);
+
 
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault();
@@ -104,7 +105,7 @@ export default function DataKomoditasView() {
   const { nextStep, prevStep } = useStepStore();
   const [dateTanam, setDateTanam] = useState<Date>();
   const [datePerkiraanPanen, setDatePerkiraanPanen] = useState<Date>();
-
+  const navigate = useNavigate();
 
   const formatIndonesianLong = (date: Date) => {
     const bulan = [
@@ -436,14 +437,14 @@ export default function DataKomoditasView() {
       {/* Action Buttons */}
       <div className="flex flex-col sm:flex-row justify-end gap-3 bg-white rounded-3xl shadow-sm border border-gray-100 p-6 md:p-8">
         <Button
-          onClick={prevStep}
+          onClick={() => navigate("/komoditas")}
           variant="outline"
           className="sm:w-auto w-full border-green-600 text-green-600 hover:bg-green-50 font-semibold py-6 px-10 rounded-xl transition-all duration-200"
         >
           Kembali
         </Button>
         <Button
-          onClick={nextStep}
+          onClick={() => navigate("/aspirasi-tani")}
           className="sm:w-auto w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-6 px-10 rounded-xl transition-all duration-200 shadow-lg flex items-center justify-center gap-2"
         >
           Selanjutnya
