@@ -6,12 +6,13 @@ import { assets } from "~/assets/assets";
 import { ALL_STEPS } from "~/const/sidebar_step";
 import { useIsMobile } from "~/hook/use-mobile";
 import { useStepStore } from "~/store/stepStore";
+import Banner from "~/features/index/components/Banner";
 
 export function SidebarMenu() {
   const isMobile = useIsMobile();
   const location = useLocation();
   const { currentStep, setStep } = useStepStore();
-  
+
   // Sync step store with current route, but only when route doesn't match current step
   useEffect(() => {
     const matchedStep = ALL_STEPS.find(step => step.path === location.pathname);
@@ -84,40 +85,55 @@ export function SidebarMenu() {
         </aside>
       ) : (
         /* Mobile */
-        <div className="sticky top-0 bg-white border-b border-gray-200 shadow-sm z-50 px-4 py-4">
-          <div className="mt-3 text-center mb-4">
-            <p className="text-normal font-semibold text-green-600">
-              {currentStep.title}
-            </p>
+        <div className="">
+          <div className="bg-white flex justify-between items-center px-4 py-1 rounded-xl mb-5">
+            <div className="flex justify-center items-center gap-3 my-5">
+              <img src={assets.imageLogoNgawi} alt="Logo Ngawi" width={25} height={25} />
+              <span className="h-[20px] w-[1px] bg-gray-400"></span>
+              <img src={assets.imageLogo} alt="Logo Jagoan Data" width={120} height={120} />
+            </div>
+            <div className="w-9 h-9 rounded-xl bg-gray-100 flex items-center justify-center">
+              <Icon icon="material-symbols:headset-mic" className="w-6 h-6 text-gray-600" />
+            </div>
           </div>
-          <div className="flex items-center justify-between">
-            {ALL_STEPS.map((step, index) => {
-              const isCompleted = index < currentStep.number - 1;
-              const isActive = index === currentStep.number - 1;
+          {currentStep.number === 1 && (
+            <Banner />
+          )}
+          <div className="sticky top-0 bg-white border-b rounded-xl border-gray-200 shadow-sm z-50 px-4 py-4">
+            <div className="mt-3 text-center mb-4">
+              <p className="text-normal font-semibold text-green-600">
+                {currentStep.title}
+              </p>
+            </div>
+            <div className="flex items-center justify-between">
+              {ALL_STEPS.map((step, index) => {
+                const isCompleted = index < currentStep.number - 1;
+                const isActive = index === currentStep.number - 1;
 
-              return (
-                <div
-                  key={step.number}
-                  className={`flex items-center ${index < ALL_STEPS.length - 1 ? 'flex-1' : ''}`}
-                >
+                return (
                   <div
-
-                    className="relative z-10 flex-shrink-0"
+                    key={step.number}
+                    className={`flex items-center ${index < ALL_STEPS.length - 1 ? 'flex-1' : ''}`}
                   >
-                    <div className={`w-10 h-10 rounded-lg flex items-center justify-center font-semibold text-sm transition-all duration-300 ${isCompleted ? 'bg-green-600 text-white'
+                    <div
+
+                      className="relative z-10 flex-shrink-0"
+                    >
+                      <div className={`w-10 h-10 rounded-lg flex items-center justify-center font-semibold text-sm transition-all duration-300 ${isCompleted ? 'bg-green-600 text-white'
                         : isActive ? 'bg-green-100 text-green-600 border-2 border-green-600'
                           : 'bg-gray-100 text-gray-400 border-2 border-gray-200'
-                      }`}>
-                      {isCompleted ? <Icon icon="mdi:check" className="w-6 h-6" /> : step.number}
+                        }`}>
+                        {isCompleted ? <Icon icon="mdi:check" className="w-6 h-6" /> : step.number}
+                      </div>
                     </div>
+                    {index < ALL_STEPS.length - 1 && (
+                      <div className={`flex-1 h-1 mx-2 transition-all duration-300 ${index < currentStep.number - 1 ? 'bg-green-600' : 'bg-gray-200'
+                        }`} />
+                    )}
                   </div>
-                  {index < ALL_STEPS.length - 1 && (
-                    <div className={`flex-1 h-1 mx-2 transition-all duration-300 ${index < currentStep.number - 1 ? 'bg-green-600' : 'bg-gray-200'
-                      }`} />
-                  )}
-                </div>
-              );
-            })}
+                );
+              })}
+            </div>
           </div>
         </div>
       )}

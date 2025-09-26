@@ -439,13 +439,13 @@ export default function DataKomoditasView() {
         <Button
           onClick={() => navigate("/komoditas")}
           variant="outline"
-          className="sm:w-auto w-full border-green-600 text-green-600 hover:bg-green-50 font-semibold py-6 px-10 rounded-xl transition-all duration-200"
+          className="sm:w-auto w-full hover:border-green-600 cursor-pointer hover:text-green-600 border-green-600 text-green-600 hover:bg-green-50 font-semibold py-6 px-10 rounded-xl transition-all duration-200"
         >
           Kembali
         </Button>
         <Button
           onClick={() => navigate("/aspirasi-tani")}
-          className="sm:w-auto w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-6 px-10 rounded-xl transition-all duration-200 shadow-lg flex items-center justify-center gap-2"
+          className="sm:w-auto w-full bg-green-600 cursor-pointer hover:bg-green-700 text-white font-semibold py-6 px-10 rounded-xl transition-all duration-200 shadow-lg flex items-center justify-center gap-2"
         >
           Selanjutnya
           <Icon icon="material-symbols:chevron-right" className="w-5 h-5" />
