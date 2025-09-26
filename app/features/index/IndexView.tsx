@@ -56,23 +56,56 @@ export function IndexView() {
   // Aktifkan GPS location
   const aktivasiLokasi = () => {
     setIsLoadingLocation(true);
-    if ("geolocation" in navigator) {
-      navigator.geolocation.getCurrentPosition(
-        (pos) => {
-          const newPosition: [number, number] = [pos.coords.latitude, pos.coords.longitude];
-          setPosition(newPosition);
-          setIsLoadingLocation(false);
-        },
-        (error) => {
-          console.error("Error getting location:", error);
-          alert("Tidak dapat mengakses lokasi. Pastikan izin lokasi diaktifkan.");
-          setIsLoadingLocation(false);
-        }
-      );
-    } else {
+    
+    // Check if geolocation is supported
+    if (!("geolocation" in navigator)) {
       alert("Geolocation tidak didukung oleh browser Anda.");
       setIsLoadingLocation(false);
+      return;
     }
+
+    // Check if running on localhost (HTTP) vs production (HTTPS)
+    const isSecureContext = window.isSecureContext;
+    if (!isSecureContext) {
+      console.warn("Geolocation might not work properly in non-HTTPS environment");
+    }
+
+    // Use more specific options for mobile
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        const newPosition: [number, number] = [pos.coords.latitude, pos.coords.longitude];
+        setPosition(newPosition);
+        setIsLoadingLocation(false);
+        console.log(`Location received: ${newPosition[0]}, ${newPosition[1]}`);
+      },
+      (error) => {
+        setIsLoadingLocation(false);
+        console.error("Error getting location:", error);
+        
+        // Provide more specific error messages
+        let errorMessage = "Tidak dapat mengakses lokasi. ";
+        switch (error.code) {
+          case error.PERMISSION_DENIED:
+            errorMessage += "Izin lokasi ditolak. Silakan aktifkan izin lokasi di pengaturan browser/device Anda.";
+            break;
+          case error.POSITION_UNAVAILABLE:
+            errorMessage += "Informasi lokasi tidak tersedia.";
+            break;
+          case error.TIMEOUT:
+            errorMessage += "Permintaan lokasi timeout.";
+            break;
+          default:
+            errorMessage += "Pastikan izin lokasi diaktifkan dan coba lagi.";
+            break;
+        }
+        alert(errorMessage);
+      },
+      {
+        enableHighAccuracy: true,  // Use GPS if available for better accuracy
+        timeout: 10000,           // 10 seconds timeout
+        maximumAge: 60000         // Accept cached position up to 1 minute old
+      }
+    );
   };
 
   const formatIndonesianLong = (date: Date) => {
