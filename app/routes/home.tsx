@@ -1,7 +1,8 @@
+import { Index } from "~/features/index";
 import type { Route } from "./+types/home";
-import { App } from "../features/index/app";
 
-export function meta({}: Route.MetaArgs) {
+
+export function meta({ }: Route.MetaArgs) {
   return [
     { title: "Form Pertanian" },
     { name: "description", content: "Form Pertanian" },
@@ -9,5 +10,7 @@ export function meta({}: Route.MetaArgs) {
 }
 
 export default function Home() {
-  return <App />;
+  return (
+    <Index />
+  );
 }
