@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Button } from "~/components/ui/button";
 import { Icon } from "@iconify/react";
-import { useStepStore } from "~/store/stepStore";
+import { useNavigate } from "react-router";
 
 interface KomoditasType {
   id: string;
@@ -11,7 +11,7 @@ interface KomoditasType {
 
 export default function KomoditasView() {
   const [selectedKomoditas, setSelectedKomoditas] = useState<string | null>(null);
-  const {prevStep, nextStep } = useStepStore();
+  const navigate = useNavigate();
 
   const komoditasList: KomoditasType[] = [
     {
@@ -80,14 +80,14 @@ export default function KomoditasView() {
       {/* Action Buttons */}
       <div className="flex justify-end gap-3">
         <Button
-          onClick={prevStep}
+          onClick={() => navigate('/')}
           variant="outline"
-          className="px-8 py-6 rounded-xl border-green-600 text-green-600 hover:bg-green-50"
+          className="px-8 py-6 rounded-xl cursor-pointer  border-green-600 text-green-600 hover:bg-green-50 hover:text-green-600"
         >
           Kembali
         </Button>
         <Button
-          onClick={nextStep}
+          onClick={() => navigate("/data-komoditas")}
           disabled={!selectedKomoditas}
           className="bg-green-600 hover:bg-green-700 text-white font-semibold py-6 px-10 rounded-xl transition-all duration-200 shadow-lg flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
         >

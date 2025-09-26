@@ -1,4 +1,6 @@
 // components/SidebarMenu.tsx
+import { useLocation } from "react-router";
+import { useEffect } from "react";
 import { Icon } from "@iconify/react";
 import { assets } from "~/assets/assets";
 import { ALL_STEPS } from "~/const/sidebar_step";
@@ -7,8 +9,16 @@ import { useStepStore } from "~/store/stepStore";
 
 export function SidebarMenu() {
   const isMobile = useIsMobile();
+  const location = useLocation();
   const { currentStep, setStep } = useStepStore();
-
+  
+  // Sync step store with current route, but only when route doesn't match current step
+  useEffect(() => {
+    const matchedStep = ALL_STEPS.find(step => step.path === location.pathname);
+    if (matchedStep && matchedStep.number !== currentStep.number) {
+      setStep(matchedStep);
+    }
+  }, [location.pathname, currentStep.number, setStep]);
 
   return (
     <>
