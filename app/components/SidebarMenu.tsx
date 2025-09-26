@@ -32,7 +32,7 @@ export function SidebarMenu() {
       number: 4,
       title: 'Aspirasi Petani',
       desc: 'Bagikan aspirasi dan masukan dari petani.',
-      path: '/aspirasi-petani'
+      path: '/aspirasi-tani'
     }
   ];
 
@@ -66,10 +66,10 @@ export function SidebarMenu() {
                   >
                     <div className="relative">
                       <div className={`flex gap-4 p-4 rounded-lg transition-all duration-200 ${isActive
-                        ? 'bg-red-50' // Current step - spotlight dengan bg merah
+                        ? 'bg-green-100' // Current step - spotlight dengan bg merah
                         : isCompleted
                           ? 'bg-green-50' // Completed step - bg hijau tanpa spotlight
-                          : 'hover:bg-gray-50' // Upcoming step - hover abu-abu
+                          : '' // Upcoming step - hover abu-abu
                         }`}>
                         <div className={`w-8 h-8 rounded-full flex items-center justify-center font-semibold text-sm flex-shrink-0 ${isCompleted
                           ? 'bg-green-600 text-white' // Completed - hijau dengan checkmark
@@ -125,6 +125,11 @@ export function SidebarMenu() {
       ) : (
         /* Mobile View - Progress Bar */
         <div className="sticky top-0 bg-white border-b border-gray-200 shadow-sm z-50 px-4 py-4">
+          <div className="mt-3 text-center mb-4">
+            <p className="text-normal font-semibold text-green-600">
+              {steps[currentStep - 1]?.title}
+            </p>
+          </div>
           <div className="flex items-center justify-between">
             {steps.map((step, index) => {
               const isCompleted = index < currentStep - 1;
@@ -132,7 +137,10 @@ export function SidebarMenu() {
               const isUpcoming = index > currentStep - 1;
 
               return (
-                <div key={step.number} className="flex items-center flex-1">
+                <div
+                  key={step.number}
+                  className={`flex items-center ${index < steps.length - 1 ? 'flex-1' : ''}`}
+                >
                   {/* Step Circle */}
                   <div
                     onClick={() => handleStepClick(step.number)}
@@ -165,14 +173,7 @@ export function SidebarMenu() {
           </div>
 
           {/* Active Step Title */}
-          <div className="mt-3 text-center">
-            <p className="text-sm font-semibold text-green-600">
-              {steps[currentStep - 1]?.title}
-            </p>
-            <p className="text-xs text-gray-500 mt-0.5">
-              Langkah {currentStep} dari {steps.length}
-            </p>
-          </div>
+
         </div>
       )}
     </>
