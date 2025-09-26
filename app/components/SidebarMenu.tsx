@@ -31,7 +31,7 @@ export function SidebarMenu() {
                 return (
                   <div
                     key={step.number}
-                    className="block cursor-pointer"
+                    className="block "
                   >
                     <div className="relative">
                       <div className={`flex gap-4 p-4 rounded-lg transition-all duration-200 ${isActive ? 'bg-green-100' : isCompleted ? 'bg-green-50' : ''
@@ -91,7 +91,8 @@ export function SidebarMenu() {
                   className={`flex items-center ${index < ALL_STEPS.length - 1 ? 'flex-1' : ''}`}
                 >
                   <div
-                    className="relative z-10 flex-shrink-0 cursor-pointer"
+
+                    className="relative z-10 flex-shrink-0"
                   >
                     <div className={`w-10 h-10 rounded-lg flex items-center justify-center font-semibold text-sm transition-all duration-300 ${isCompleted ? 'bg-green-600 text-white'
                         : isActive ? 'bg-green-100 text-green-600 border-2 border-green-600'
