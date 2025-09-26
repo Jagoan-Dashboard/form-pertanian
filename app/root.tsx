@@ -11,6 +11,7 @@ import type { Route } from "./+types/root";
 import "./app.css";
 
 export const links: Route.LinksFunction = () => [
+  // Font preconnect
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
   {
     rel: "preconnect",
@@ -21,14 +22,33 @@ export const links: Route.LinksFunction = () => [
     rel: "stylesheet",
     href: "https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap",
   },
+  
+  // Favicon configuration
+  { rel: "icon", href: "/favicon.ico" },
+  { rel: "apple-touch-icon", href: "/apple-touch-icon.png" },
+  { 
+    rel: "apple-touch-icon-precomposed", 
+    href: "/apple-touch-icon-precomposed.png" 
+  },
+  { rel: "manifest", href: "/manifest.json" },
 ];
 
 export function Layout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="id">
       <head>
         <meta charSet="utf-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+        <meta name="theme-color" content="#ffffff" />
+        <meta name="color-scheme" content="light" />
+        
+        {/* Meta tags SEO */}
+        <title>Dashboard Ngawi</title>
+        <meta name="description" content="Dashboard Ngawi" />
+        <meta name="application-name" content="Dashboard Ngawi" />
+        <meta name="author" content="Pemerintah Kabupaten Ngawi" />
+        <meta name="keywords" content="Dashboard Ngawi, Pemerintah Kabupaten Ngawi" />
+
         <Meta />
         <Links />
       </head>
