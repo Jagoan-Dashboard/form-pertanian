@@ -1,7 +1,7 @@
 
 import { isRouteErrorResponse } from "react-router";
 import type { Route } from "../+types/root";
-import { MainLayout } from "~/features/index/main-layout";
+import { MainLayout } from "~/layout/main-layout";
 
 export function meta({}: Route.MetaArgs) {
   return [

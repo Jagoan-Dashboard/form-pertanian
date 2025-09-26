@@ -9,6 +9,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "~/components/ui/popover
 import { cn } from "~/lib/utils";
 import { id as idLocale } from "date-fns/locale/id";
 import { Calendar } from "~/components/ui/calendar";
+import { useStepStore } from "~/store/stepStore";
 
 export function IndexView() {
   const [position, setPosition] = useState<[number, number]>([-7.4034, 111.4464]); // Default: Ngawi
@@ -16,6 +17,9 @@ export function IndexView() {
   const [longitude, setLongitude] = useState('111.4464');
   const [isLoadingLocation, setIsLoadingLocation] = useState(false);
   const [date, setDate] = useState<Date>();
+
+  const { currentStep, nextStep, prevStep } = useStepStore();
+
 
   const steps = [
     { number: 1, title: 'Data Penyuluh', desc: 'Masukan identitas penyuluh dan petani' },
@@ -255,7 +259,7 @@ export function IndexView() {
         </div>
 
         <div className="mt-8 flex w-full justify-end ">
-          <Button className="bg-green-600 sm:w-fit cursor-pointer w-full hover:bg-green-700 text-white font-semibold py-6 px-10 rounded-xl transition-all duration-200 shadow-lg flex items-center gap-2">
+          <Button onClick={nextStep} className="bg-green-600 sm:w-fit cursor-pointer w-full hover:bg-green-700 text-white font-semibold py-6 px-10 rounded-xl transition-all duration-200 shadow-lg flex items-center gap-2">
             Selanjutnya
             <Icon icon="material-symbols:chevron-right" className="w-5 h-5" />
           </Button>
