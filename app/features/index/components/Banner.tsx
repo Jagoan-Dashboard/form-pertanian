@@ -1,7 +1,7 @@
 export default function Banner() {
   return <div className="">
     {/* Hero Banner */}
-    <div className="relative bg-gradient-to-r from-green-600 to-emerald-700 rounded-3xl p-8 md:p-12 text-white overflow-hidden shadow-xl">
+    <div className="relative bg-gradient-to-r from-green-600 to-emerald-700 rounded-3xl p-8 md:p-12 text-white overflow-hidden ">
       <div className="absolute inset-0 opacity-10">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_50%,rgba(255,255,255,0.2),transparent_50%)]"></div>
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_80%,rgba(255,255,255,0.15),transparent_50%)]"></div>

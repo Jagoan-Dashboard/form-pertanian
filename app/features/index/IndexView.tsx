@@ -10,7 +10,7 @@ import { cn } from "~/lib/utils";
 import { id as idLocale } from "date-fns/locale/id";
 import { Calendar } from "~/components/ui/calendar";
 
-export function Index() {
+export function IndexView() {
   const [position, setPosition] = useState<[number, number]>([-7.4034, 111.4464]); // Default: Ngawi
   const [latitude, setLatitude] = useState('-7.4034');
   const [longitude, setLongitude] = useState('111.4464');
@@ -82,7 +82,9 @@ export function Index() {
 
   return (
     <main className="space-y-6">
-      <Banner />
+      <div className="hidden sm:block">
+        <Banner />
+      </div>
 
       {/* Koordinat Lokasi */}
       <div className="bg-white rounded-3xl shadow-sm border border-gray-100 p-6 md:p-8">
@@ -206,7 +208,7 @@ export function Index() {
                   mode="single"
                   selected={date}
                   onSelect={setDate}
-                  
+
                   locale={idLocale}
                   className="rounded-2xl"
                 />

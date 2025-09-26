@@ -1,5 +1,5 @@
-import { Index } from "~/features/index";
-import type { Route } from "./+types/home";
+import { IndexView } from "~/features/index/IndexView";
+import type { Route } from "./+types/index";
 
 
 export function meta({ }: Route.MetaArgs) {
@@ -9,8 +9,8 @@ export function meta({ }: Route.MetaArgs) {
   ];
 }
 
-export default function Home() {
+export default function Index() {
   return (
-    <Index />
+    <IndexView />
   );
 }

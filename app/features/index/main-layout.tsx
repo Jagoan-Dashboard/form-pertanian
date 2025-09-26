@@ -7,13 +7,13 @@ export function MainLayout() {
       <div className="container mx-auto px-4 py-8 max-w-7xl">
         <div className="grid sm:grid-cols-4 gap-6 flex-row">
           {/* Sidebar Menu */}
-          <div className="sm:block hidden col-span-1">
+          <div className="sm:block col-span-full md:col-span-1">
             <SidebarMenu />
 
           </div>
 
           {/* Main Content */}
-          <main className="space-y-6 col-span-3">
+          <main className="space-y-6 col-span-full sm:col-span-3">
             <Outlet />
           </main>
         </div>
