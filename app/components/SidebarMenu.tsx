@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Icon } from '@iconify/react';
 
-export function SiderbarMenu() {
+export function SidebarMenu() {
   const [currentStep, setCurrentStep] = useState(1);
   const steps = [
     { number: 1, title: 'Data Penyuluh', desc: 'Masukan identitas penyuluh dan petani' },
@@ -10,7 +10,7 @@ export function SiderbarMenu() {
     { number: 4, title: 'Aspirasi Petani', desc: 'Bagikan aspirasi dan masukan dari petani' }
   ];
   return (
-    <aside className="lg:sticky lg:top-24 h-fit">
+    <aside className="lg:sticky lg:top-[5%] h-fit">
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
         <div className="space-y-4">
           {steps.map((step) => (

@@ -1,16 +1,19 @@
 import { Outlet } from "react-router";
-import { SiderbarMenu } from "../components/SiderbarMenu";
+import { SidebarMenu } from "~/components/SidebarMenu";
 
 export function MainLayout() {
   return (
     <div className="min-h-screen bg-[#F8F3F5]">
       <div className="container mx-auto px-4 py-8 max-w-7xl">
-        <div className="grid lg:grid-cols-[300px,1fr] gap-6">
+        <div className="grid sm:grid-cols-4 gap-6 flex-row">
           {/* Sidebar Menu */}
-          <SiderbarMenu />
+          <div className="sm:block hidden col-span-1">
+            <SidebarMenu />
+
+          </div>
 
           {/* Main Content */}
-          <main className="space-y-6">
+          <main className="space-y-6 col-span-3">
             <Outlet />
           </main>
         </div>
