@@ -1,108 +1,18 @@
-import { useState } from "react";
-import { Button } from "~/components/ui/button";
-import { Input } from "~/components/ui/input";
-import { Label } from "~/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "~/components/ui/select";
-import { Icon } from "@iconify/react";
-import { useStepStore } from "~/store/stepStore";
-import { Popover, PopoverContent, PopoverTrigger } from "~/components/ui/popover";
-import { cn } from "~/lib/utils";
-import { id as idLocale } from "date-fns/locale/id";
-import { Calendar } from "~/components/ui/calendar";
 import { CalendarIcon } from "lucide-react";
+import { useState } from "react";
 import { useNavigate } from "react-router";
-// Drag & Drop Upload Component
-function ImageUpload() {
-  const [isDragging, setIsDragging] = useState(false);
-  const [preview, setPreview] = useState<string | null>(null);
+import { Button } from "~/components/ui/button";
+import { Calendar } from "~/components/ui/calendar";
+import { Input } from "~/components/ui/input";
+import { id as idLocale } from "date-fns/locale/id";
+import { Label } from "~/components/ui/label";
+import { Popover, PopoverContent, PopoverTrigger } from "~/components/ui/popover";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "~/components/ui/select";
+import { cn } from "~/lib/utils";
+import { Icon } from "@iconify/react";
+import { ImageUpload } from "~/components/ImageUplaod";
 
-
-  const handleDragOver = (e: React.DragEvent) => {
-    e.preventDefault();
-    setIsDragging(true);
-  };
-
-  const handleDragLeave = () => {
-    setIsDragging(false);
-  };
-
-  const handleDrop = (e: React.DragEvent) => {
-    e.preventDefault();
-    setIsDragging(false);
-
-    const file = e.dataTransfer.files[0];
-    if (file && file.type.startsWith('image/')) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setPreview(reader.result as string);
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-
-  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setPreview(reader.result as string);
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-
-  return (
-    <div
-      onDragOver={handleDragOver}
-      onDragLeave={handleDragLeave}
-      onDrop={handleDrop}
-      className={`relative border-2 border-dashed rounded-xl p-8 transition-all ${isDragging
-        ? 'border-green-600 bg-green-50'
-        : 'border-gray-300 hover:border-green-400'
-        }`}
-    >
-      <input
-        type="file"
-        accept="image/*"
-        onChange={handleFileSelect}
-        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-      />
-
-      {preview ? (
-        <div className="relative">
-          <img src={preview} alt="Preview" className="w-full h-48 object-cover rounded-lg" />
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              setPreview(null);
-            }}
-            className="absolute top-2 right-2 bg-red-500 text-white p-2 rounded-full hover:bg-red-600"
-          >
-            <Icon icon="mdi:close" className="w-4 h-4" />
-          </button>
-        </div>
-      ) : (
-        <div className="text-center">
-          <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <Icon icon="mdi:cloud-upload" className="w-8 h-8 text-green-600" />
-          </div>
-          <p className="text-sm font-semibold text-gray-700 mb-1">
-            Upload Foto Pertumbuhan
-          </p>
-          <p className="text-xs text-gray-500">
-            Drag & drop atau klik untuk upload
-          </p>
-          <p className="text-xs text-gray-400 mt-2">
-            PNG, JPG, JPEG (Max 5MB)
-          </p>
-        </div>
-      )}
-    </div>
-  );
-}
-
-export default function DataKomoditasView() {
-  const { nextStep, prevStep } = useStepStore();
+export default function DataKomoditasHortikulturaView() {
   const [dateTanam, setDateTanam] = useState<Date>();
   const [datePerkiraanPanen, setDatePerkiraanPanen] = useState<Date>();
   const navigate = useNavigate();
@@ -115,6 +25,15 @@ export default function DataKomoditasView() {
     return `${date.getDate()} ${bulan[date.getMonth()]} ${date.getFullYear()}`;
   };
 
+  // State untuk file upload
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      setSelectedFile(e.target.files[0]);
+    }
+  };
+
   return (
     <div className="space-y-6">
       {/* Data Komoditas Section */}
@@ -122,19 +41,36 @@ export default function DataKomoditasView() {
         <h2 className="text-2xl font-bold text-gray-800 mb-6">Data Komoditas</h2>
 
         <div className="grid md:grid-cols-2 gap-6">
-          {/* Komoditas Pangan */}
+          {/* Jenis Hortikultura yang Ditanam */}
           <div>
             <Label className="text-sm font-semibold text-gray-700 mb-2">
-              Komoditas Pangan yang Ditanam*
+              Jenis Hortikultura yang Ditanam*
             </Label>
             <Select>
               <SelectTrigger className="w-full h-12 rounded-xl border-gray-200">
-                <SelectValue placeholder="Pilih Komoditas Pangan" />
+                <SelectValue placeholder="Pilih Jenis Hortikultura" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="padi">Padi</SelectItem>
-                <SelectItem value="jagung">Jagung</SelectItem>
-                <SelectItem value="kedelai">Kedelai</SelectItem>
+                <SelectItem value="sayuran">Sayuran</SelectItem>
+                <SelectItem value="buah">Buah</SelectItem>
+                <SelectItem value="tanaman-hias">Tanaman Hias</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Komoditas Hortikultura yang Ditanam */}
+          <div>
+            <Label className="text-sm font-semibold text-gray-700 mb-2">
+              Komoditas Hortikultura yang Ditanam*
+            </Label>
+            <Select>
+              <SelectTrigger className="w-full h-12 rounded-xl border-gray-200">
+                <SelectValue placeholder="Pilih Komoditas Hortikultura" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="tomat">Tomat</SelectItem>
+                <SelectItem value="cabai">Cabai</SelectItem>
+                <SelectItem value="jeruk">Jeruk</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -156,7 +92,7 @@ export default function DataKomoditasView() {
             </Select>
           </div>
 
-          {/* Luas Lahan */}
+          {/* Luas Lahan (Ha) */}
           <div>
             <Label className="text-sm font-semibold text-gray-700 mb-2">
               Luas Lahan (Ha)*
@@ -185,7 +121,7 @@ export default function DataKomoditasView() {
             </Select>
           </div>
 
-          {/* Umur Tanaman */}
+          {/* Umur Tanaman (Hari) */}
           <div>
             <Label className="text-sm font-semibold text-gray-700 mb-2">
               Umur Tanaman (Hari)*
@@ -195,23 +131,6 @@ export default function DataKomoditasView() {
               placeholder="Contoh: 15"
               className="h-12 rounded-xl border-gray-200"
             />
-          </div>
-
-          {/* Teknologi/Metode */}
-          <div>
-            <Label className="text-sm font-semibold text-gray-700 mb-2">
-              Teknologi/Metode*
-            </Label>
-            <Select>
-              <SelectTrigger className="w-full h-12 rounded-xl border-gray-200">
-                <SelectValue placeholder="Pilih Teknologi/Metode" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="konvensional">Konvensional</SelectItem>
-                <SelectItem value="organik">Organik</SelectItem>
-                <SelectItem value="hidroponik">Hidroponik</SelectItem>
-              </SelectContent>
-            </Select>
           </div>
 
           {/* Tanggal Tanam */}
@@ -233,9 +152,9 @@ export default function DataKomoditasView() {
                       {formatIndonesianLong(dateTanam)}
                     </span>
                   ) : (
-                    <span className="text-gray-400">Pilih tanggal kunjungan</span>
+                    <span className="text-gray-400">DD/MM/YYYY</span>
                   )}
-                  <CalendarIcon className="mr-2 h-5 w-5 text-gray-700" />
+                  <CalendarIcon className="ml-2 h-5 w-5 text-gray-700" />
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="w-auto p-0 rounded-2xl border-gray-200" align="start">
@@ -243,7 +162,6 @@ export default function DataKomoditasView() {
                   mode="single"
                   selected={dateTanam}
                   onSelect={setDateTanam}
-
                   locale={idLocale}
                   className="rounded-2xl"
                 />
@@ -270,9 +188,9 @@ export default function DataKomoditasView() {
                       {formatIndonesianLong(datePerkiraanPanen)}
                     </span>
                   ) : (
-                    <span className="text-gray-400">Pilih tanggal kunjungan</span>
+                    <span className="text-gray-400">DD/MM/YYYY</span>
                   )}
-                  <CalendarIcon className="mr-2 h-5 w-5 text-gray-700" />
+                  <CalendarIcon className="ml-2 h-5 w-5 text-gray-700" />
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="w-auto p-0 rounded-2xl border-gray-200" align="start">
@@ -280,7 +198,6 @@ export default function DataKomoditasView() {
                   mode="single"
                   selected={datePerkiraanPanen}
                   onSelect={setDatePerkiraanPanen}
-
                   locale={idLocale}
                   className="rounded-2xl"
                 />
@@ -305,23 +222,48 @@ export default function DataKomoditasView() {
             </Select>
           </div>
 
+          {/* Teknologi/Metode */}
+          <div>
+            <Label className="text-sm font-semibold text-gray-700 mb-2">
+              Teknologi/Metode*
+            </Label>
+            <Select>
+              <SelectTrigger className="w-full h-12 rounded-xl border-gray-200">
+                <SelectValue placeholder="Pilih Teknologi/Metode" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="konvensional">Konvensional</SelectItem>
+                <SelectItem value="organik">Organik</SelectItem>
+                <SelectItem value="hidroponik">Hidroponik</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Masalah Pascapanen */}
+          <div>
+            <Label className="text-sm font-semibold text-gray-700 mb-2">
+              Masalah Pascapanen*
+            </Label>
+            <Select>
+              <SelectTrigger className="w-full h-12 rounded-xl border-gray-200">
+                <SelectValue placeholder="Pilih Masalah Pascapanen" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="tidak-ada">Tidak Ada</SelectItem>
+                <SelectItem value="kerusakan">Kerusakan Fisik</SelectItem>
+                <SelectItem value="penyimpanan">Masalah Penyimpanan</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
 
         </div>
-        {/* Foto Lokasi */}
-        <div>
-          <Label className="text-sm font-semibold text-gray-700 mb-4 mt-6">
-            Foto Lokasi*
-          </Label>
-          <ImageUpload />
-        </div>
-
-        {/* Upload Button - Mobile */}
-        <div className="mt-6 md:hidden">
-          <Button className="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-6 rounded-xl">
-            <Icon icon="mdi:upload" className="w-5 h-5 mr-2" />
-            Unggah
-          </Button>
-        </div>
+          {/* Foto Lokasi */}
+          <div>
+            <Label className="text-sm font-semibold text-gray-700 mb-4 mt-6">
+              Foto Lokasi*
+            </Label>
+            <ImageUpload />
+          </div>
       </div>
 
       {/* Laporan Hama, Penyakit, dan Keadaan Cuaca Section */}
@@ -433,6 +375,7 @@ export default function DataKomoditasView() {
           </div>
         </div>
       </div>
+
 
       {/* Action Buttons */}
       <div className="flex flex-col sm:flex-row justify-end gap-3 bg-white rounded-3xl shadow-sm border border-gray-100 p-6 md:p-8">

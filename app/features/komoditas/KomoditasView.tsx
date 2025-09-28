@@ -7,6 +7,7 @@ interface KomoditasType {
   id: string;
   name: string;
   icon: string;
+  navigate: string;
 }
 
 export default function KomoditasView() {
@@ -17,17 +18,20 @@ export default function KomoditasView() {
     {
       id: "pangan",
       name: "Pangan",
-      icon: "streamline-plump:wheat-solid"
+      icon: "streamline-plump:wheat-solid",
+      navigate: "/data-komoditas-pangan"
     },
     {
       id: "hortikultura",
       name: "Hortikultura",
-      icon: "ri:plant-fill"
+      icon: "ri:plant-fill",
+      navigate: "/data-komoditas-hortikultura"
     },
     {
       id: "perkebunan",
       name: "Perkebunan",
-      icon: "mdi:seed"
+      icon: "mdi:seed",
+      navigate: "/data-komoditas-perkebunan"
     }
   ];
 
@@ -46,30 +50,26 @@ export default function KomoditasView() {
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
         {komoditasList.map((komoditas) => {
           const isSelected = selectedKomoditas === komoditas.id;
-          
+
           return (
             <button
               key={komoditas.id}
               onClick={() => handleSelect(komoditas.id)}
-              className={`p-6 rounded-2xl border-2 transition-all duration-200 ${
-                isSelected
+              className={`p-6 rounded-2xl border-2 transition-all duration-200 ${isSelected
                   ? "border-green-600 bg-green-50"
                   : "border-gray-200 bg-white hover:border-green-300 hover:bg-gray-50"
-              }`}
+                }`}
             >
-              <div className={`w-16 h-16 rounded-2xl mx-auto mb-4 flex items-center justify-center ${
-                isSelected ? "bg-green-600" : "bg-green-100"
-              }`}>
+              <div className={`w-16 h-16 rounded-2xl mx-auto mb-4 flex items-center justify-center ${isSelected ? "bg-green-600" : "bg-green-100"
+                }`}>
                 <Icon
                   icon={komoditas.icon}
-                  className={`w-8 h-8 ${
-                    isSelected ? "text-white" : "text-green-600"
-                  }`}
+                  className={`w-8 h-8 ${isSelected ? "text-white" : "text-green-600"
+                    }`}
                 />
               </div>
-              <p className={`text-center font-semibold ${
-                isSelected ? "text-green-600" : "text-gray-700"
-              }`}>
+              <p className={`text-center font-semibold ${isSelected ? "text-green-600" : "text-gray-700"
+                }`}>
                 {komoditas.name}
               </p>
             </button>
@@ -80,14 +80,18 @@ export default function KomoditasView() {
       {/* Action Buttons */}
       <div className="flex justify-end gap-3">
         <Button
-          onClick={() => navigate('/')}
           variant="outline"
           className="px-8 py-6 rounded-xl cursor-pointer  border-green-600 text-green-600 hover:bg-green-50 hover:text-green-600"
         >
           Kembali
         </Button>
         <Button
-          onClick={() => navigate("/data-komoditas")}
+          onClick={() => {
+            const selected = komoditasList.find(k => k.id === selectedKomoditas);
+            if (selected) {
+              navigate(selected.navigate);
+            }
+          }}
           disabled={!selectedKomoditas}
           className="bg-green-600 cursor-pointer hover:bg-green-700 text-white font-semibold py-6 px-10 rounded-xl transition-all duration-200 shadow-lg flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
         >
