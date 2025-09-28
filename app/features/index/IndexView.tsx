@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { z } from "zod";
 import Maps from "./components/Maps";
 import { Icon } from "@iconify/react";
 import Banner from "./components/Banner";
@@ -9,8 +10,9 @@ import { Popover, PopoverContent, PopoverTrigger } from "~/components/ui/popover
 import { cn } from "~/lib/utils";
 import { id as idLocale } from "date-fns/locale/id";
 import { Calendar } from "~/components/ui/calendar";
-import { useStepStore } from "~/store/stepStore";
 import { useNavigate } from "react-router";
+
+import { indexViewSchema } from "~/features/index/validation/validation";
 
 export function IndexView() {
   const [position, setPosition] = useState<[number, number]>([-7.4034, 111.4464]); // Default: Ngawi
@@ -18,14 +20,12 @@ export function IndexView() {
   const [longitude, setLongitude] = useState('111.4464');
   const [isLoadingLocation, setIsLoadingLocation] = useState(false);
   const [date, setDate] = useState<Date>();
+  const [namaPenyuluh, setNamaPenyuluh] = useState('');
+  const [namaPetani, setNamaPetani] = useState('');
+  const [namaKelompokTani, setNamaKelompokTani] = useState('');
+  const [desaKecamatan, setDesaKecamatan] = useState('');
+  const [errors, setErrors] = useState<Record<string, string>>({});
   const navigate = useNavigate();
-
-  const steps = [
-    { number: 1, title: 'Data Penyuluh', desc: 'Masukan identitas penyuluh dan petani' },
-    { number: 2, title: 'Komoditas', desc: 'Pilih jenis komoditas yang ditanam' },
-    { number: 3, title: 'Data Komoditas', desc: 'Lengkapi informasi detail terkait komoditas' },
-    { number: 4, title: 'Aspirasi Petani', desc: 'Bagikan aspirasi dan masukan dari petani' }
-  ];
 
   // Sync position dengan input values
   useEffect(() => {
@@ -116,6 +116,49 @@ export function IndexView() {
     return `${date.getDate()} ${bulan[date.getMonth()]} ${date.getFullYear()}`;
   };
 
+  // Validation function
+  // Fixed validation function
+const validateForm = () => {
+  try {
+    indexViewSchema.parse({
+      latitude,
+      longitude,
+      namaPenyuluh,
+      tanggalKunjungan: date,
+      namaPetani,
+      namaKelompokTani,
+      desaKecamatan
+    });
+    
+    // If validation passes, clear errors
+    setErrors({});
+    return true;
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      const newErrors: Record<string, string> = {};
+      error.issues.forEach((err) => {
+        // Use the field path as key, not the message
+        if (err.path && err.path.length > 0) {
+          const fieldName = err.path[0] as string;
+          newErrors[fieldName] = err.message;
+        }
+      });
+      setErrors(newErrors);
+      return false;
+    }
+    return false;
+  }
+};
+  // Handle form submission
+  const handleSubmit = () => {
+    if (validateForm()) {
+      // If validation passes, navigate to next page
+      navigate("/komoditas");
+    }
+  };
+
+  console.log(errors);
+
   return (
     <main className="space-y-6">
       <div className="hidden sm:block">
@@ -155,9 +198,16 @@ export function IndexView() {
                 type="text"
                 value={latitude}
                 onChange={(e) => handleLatitudeChange(e.target.value)}
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all"
+                className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all ${
+                  errors.latitude 
+                    ? 'border-red-500 focus:ring-red-500' 
+                    : 'border-gray-200 focus:ring-green-500'
+                }`}
                 placeholder="-7.4034"
               />
+              {errors.latitude && (
+                <p className="text-red-500 text-sm mt-1">{errors.latitude}</p>
+              )}
             </div>
 
             <div>
@@ -168,9 +218,16 @@ export function IndexView() {
                 type="text"
                 value={longitude}
                 onChange={(e) => handleLongitudeChange(e.target.value)}
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all"
+                className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all ${
+                  errors.longitude 
+                    ? 'border-red-500 focus:ring-red-500' 
+                    : 'border-gray-200 focus:ring-green-500'
+                }`}
                 placeholder="111.4464"
               />
+              {errors.longitude && (
+                <p className="text-red-500 text-sm mt-1">{errors.longitude}</p>
+              )}
             </div>
 
             <Button
@@ -211,9 +268,18 @@ export function IndexView() {
             </label>
             <Input
               type="text"
+              value={namaPenyuluh}
+              onChange={(e) => setNamaPenyuluh(e.target.value)}
               placeholder="Contoh: Penyuluh 012"
-              className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all"
+              className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all ${
+                errors.namaPenyuluh 
+                  ? 'border-red-500 focus:ring-red-500' 
+                  : 'border-gray-200 focus:ring-green-500'
+              }`}
             />
+            {errors.namaPenyuluh && (
+              <p className="text-red-500 text-sm mt-1">{errors.namaPenyuluh}</p>
+            )}
           </div>
 
           <div>
@@ -225,8 +291,10 @@ export function IndexView() {
                 <Button
                   variant="outline"
                   className={cn(
-                    "w-full justify-start text-left font-normal px-4 py-6 border-gray-200 rounded-xl hover:bg-gray-50 focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all",
-                    !date && "text-gray-500"
+                    "w-full justify-start text-left font-normal px-4 py-6 rounded-xl hover:bg-gray-50 focus:ring-2 focus:border-transparent transition-all",
+                    errors.tanggalKunjungan 
+                      ? 'border-red-500 focus:ring-red-500' 
+                      : 'border-gray-200 focus:ring-green-500'
                   )}
                 >
                   <Icon icon="material-symbols:calendar" className="mr-2 h-5 w-5 text-gray-400" />
@@ -235,7 +303,7 @@ export function IndexView() {
                       {formatIndonesianLong(date)}
                     </span>
                   ) : (
-                    <span className="text-gray-400">Pilih tanggal kunjungan</span>
+                    <span className={`${errors.tanggalKunjungan ? 'text-red-500' : 'text-gray-400'}`}>Pilih tanggal kunjungan</span>
                   )}
                 </Button>
               </PopoverTrigger>
@@ -250,6 +318,9 @@ export function IndexView() {
                 />
               </PopoverContent>
             </Popover>
+            {errors.tanggalKunjungan && (
+              <p className="text-red-500 text-sm mt-1">{errors.tanggalKunjungan}</p>
+            )}
           </div>
 
           <div>
@@ -258,9 +329,18 @@ export function IndexView() {
             </label>
             <Input
               type="text"
+              value={namaPetani}
+              onChange={(e) => setNamaPetani(e.target.value)}
               placeholder="Contoh: Samsudin"
-              className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all"
+              className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all ${
+                errors.namaPetani 
+                  ? 'border-red-500 focus:ring-red-500' 
+                  : 'border-gray-200 focus:ring-green-500'
+              }`}
             />
+            {errors.namaPetani && (
+              <p className="text-red-500 text-sm mt-1">{errors.namaPetani}</p>
+            )}
           </div>
 
           <div>
@@ -269,17 +349,30 @@ export function IndexView() {
             </label>
             <Input
               type="text"
+              value={namaKelompokTani}
+              onChange={(e) => setNamaKelompokTani(e.target.value)}
               placeholder="Contoh: Poktan Kampung Bukit"
-              className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all"
+              className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all ${
+                errors.namaKelompokTani 
+                  ? 'border-red-500 focus:ring-red-500' 
+                  : 'border-gray-200 focus:ring-green-500'
+              }`}
             />
+            {errors.namaKelompokTani && (
+              <p className="text-red-500 text-sm mt-1">{errors.namaKelompokTani}</p>
+            )}
           </div>
 
           <div className="md:col-span-2">
             <label className="block text-sm font-semibold text-gray-700 mb-2">
               Desa/Kecamatan*
             </label>
-            <Select>
-              <SelectTrigger className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all appearance-none bg-white">
+            <Select value={desaKecamatan} onValueChange={setDesaKecamatan}>
+              <SelectTrigger className={`w-full px-4 py-3 rounded-xl focus:ring-2 focus:border-transparent transition-all appearance-none bg-white ${
+                errors.desaKecamatan 
+                  ? 'border-red-500 focus:ring-red-500' 
+                  : 'border-gray-200 focus:ring-green-500'
+              }`}>
                 <SelectValue placeholder="Pilih Desa/Kecamatan" />
               </SelectTrigger>
               <SelectContent>
@@ -287,11 +380,14 @@ export function IndexView() {
                 <SelectItem value="desa-b">Desa B</SelectItem>
               </SelectContent>
             </Select>
+            {errors.desaKecamatan && (
+              <p className="text-red-500 text-sm mt-1">{errors.desaKecamatan}</p>
+            )}
           </div>
         </div>
 
         <div className="mt-8 flex w-full justify-end ">
-          <Button onClick={() => navigate("/komoditas")} className="bg-green-600 sm:w-fit cursor-pointer w-full hover:bg-green-700 text-white font-semibold py-6 px-10 rounded-xl transition-all duration-200 shadow-lg flex items-center gap-2">
+          <Button onClick={handleSubmit} className="bg-green-600 sm:w-fit cursor-pointer w-full hover:bg-green-700 text-white font-semibold py-6 px-10 rounded-xl transition-all duration-200 shadow-lg flex items-center gap-2">
             Selanjutnya
             <Icon icon="material-symbols:chevron-right" className="w-5 h-5" />
           </Button>

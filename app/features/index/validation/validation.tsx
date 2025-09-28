@@ -1,0 +1,67 @@
+import { z } from "zod";
+
+// Validation schema for the IndexView form data
+export const indexViewSchema = z.object({
+  // Coordinates validation
+  latitude: z
+    .string()
+    .min(1, "Latitude wajib diisi")
+    .refine(
+      (val) => {
+        const num = parseFloat(val);
+        return !isNaN(num) && num >= -90 && num <= 90;
+      },
+      "Latitude harus berupa angka antara -90 dan 90"
+    ),
+  
+  longitude: z
+    .string()
+    .min(1, "Longitude wajib diisi")
+    .refine(
+      (val) => {
+        const num = parseFloat(val);
+        return !isNaN(num) && num >= -180 && num <= 180;
+      },
+      "Longitude harus berupa angka antara -180 dan 180"
+    ),
+
+  // Data Penyuluh validation
+  namaPenyuluh: z
+    .string()
+    .min(1, "Nama Penyuluh wajib diisi")
+    .max(100, "Nama Penyuluh tidak boleh lebih dari 100 karakter")
+    .regex(/^[a-zA-Z\s\u00C0-\u017F\u0100-\u017F\u1E00-\u1EFF]*$/, 
+      "Nama Penyuluh hanya boleh berisi huruf dan spasi"
+    ),
+
+  tanggalKunjungan: z
+    .date({ 
+      message: "Tanggal Kunjungan wajib dipilih dan harus berupa tanggal yang valid"
+    })
+    .refine(
+      (date) => date <= new Date(),
+      "Tanggal Kunjungan tidak boleh di masa depan"
+    ),
+
+  namaPetani: z
+    .string()
+    .min(1, "Nama Petani wajib diisi")
+    .max(100, "Nama Petani tidak boleh lebih dari 100 karakter")
+    .regex(/^[a-zA-Z\s\u00C0-\u017F\u0100-\u017F\u1E00-\u1EFF]*$/,
+      "Nama Petani hanya boleh berisi huruf dan spasi"
+    ),
+
+  namaKelompokTani: z
+    .string()
+    .min(1, "Nama Kelompok Tani wajib diisi")
+    .max(100, "Nama Kelompok Tani tidak boleh lebih dari 100 karakter")
+    .regex(/^[a-zA-Z0-9\s\u00C0-\u017F\u0100-\u017F\u1E00-\u1EFF\-\.]*$/,
+      "Nama Kelompok Tani hanya boleh berisi huruf, angka, spasi, tanda hubung, dan titik"
+    ),
+
+  desaKecamatan: z
+    .string()
+    .min(1, "Desa/Kecamatan wajib dipilih"),
+});
+
+export type IndexViewFormData = z.infer<typeof indexViewSchema>;
