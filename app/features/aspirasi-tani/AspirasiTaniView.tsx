@@ -181,7 +181,7 @@ export default function AspirasiTaniView() {
           {/* Action Buttons */}
           <div className="flex flex-col sm:flex-row justify-end mt-5 gap-3">
             <Button
-              onClick={() => navigate("/data-komoditas")}
+              onClick={() => navigate(`/komoditas/${localStorage.getItem("komoditas") || "/"}`)}
               variant="outline"
               className="sm:w-auto w-full hover:text-green-600 cursor-pointer text-green-600 border-green-600 hover:bg-green-50 font-semibold py-6 px-10 rounded-xl transition-all duration-200"
             >

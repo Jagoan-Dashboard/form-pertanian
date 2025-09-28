@@ -19,19 +19,19 @@ export default function KomoditasView() {
       id: "pangan",
       name: "Pangan",
       icon: "streamline-plump:wheat-solid",
-      navigate: "/data-komoditas-pangan"
+      navigate: "/komoditas/pangan"
     },
     {
       id: "hortikultura",
       name: "Hortikultura",
       icon: "ri:plant-fill",
-      navigate: "/data-komoditas-hortikultura"
+      navigate: "/komoditas/hortikultura"
     },
     {
       id: "perkebunan",
       name: "Perkebunan",
       icon: "mdi:seed",
-      navigate: "/data-komoditas-perkebunan"
+      navigate: "/komoditas/perkebunan"
     }
   ];
 
@@ -39,6 +39,15 @@ export default function KomoditasView() {
     setSelectedKomoditas(id);
   };
 
+  const handleNext = () => {
+    const selected = komoditasList.find(k => k.id === selectedKomoditas);
+    if (selected) {
+      console.log('Navigating to:', selected.navigate);
+      // Store the selected komoditas type, not the full path
+      localStorage.setItem("komoditas", selected.id);
+      navigate(selected.navigate);
+    }
+  };
 
   return (
     <div className="bg-white rounded-3xl shadow-sm border border-gray-100 p-6 md:p-8">
@@ -81,17 +90,13 @@ export default function KomoditasView() {
       <div className="flex justify-end gap-3">
         <Button
           variant="outline"
+          onClick={() => navigate("/")}
           className="px-8 py-6 rounded-xl cursor-pointer  border-green-600 text-green-600 hover:bg-green-50 hover:text-green-600"
         >
           Kembali
         </Button>
         <Button
-          onClick={() => {
-            const selected = komoditasList.find(k => k.id === selectedKomoditas);
-            if (selected) {
-              navigate(selected.navigate);
-            }
-          }}
+          onClick={handleNext}
           disabled={!selectedKomoditas}
           className="bg-green-600 cursor-pointer hover:bg-green-700 text-white font-semibold py-6 px-10 rounded-xl transition-all duration-200 shadow-lg flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
         >

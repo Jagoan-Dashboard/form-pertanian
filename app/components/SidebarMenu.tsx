@@ -13,9 +13,36 @@ export function SidebarMenu() {
   const location = useLocation();
   const { currentStep, setStep } = useStepStore();
 
+  // Helper function to check if a step should be active based on current path
+  const isStepActiveByPath = (step: any, currentPath: string) => {
+    // For step 3 (Data Komoditas), check if we're in any /komoditas/* route except /komoditas itself
+    if (step.number === 3 && currentPath.startsWith('/komoditas/')) {
+      return true;
+    }
+    // For step 2 (Komoditas), only active when exactly on /komoditas
+    if (step.number === 2 && currentPath === '/komoditas') {
+      return true;
+    }
+    // For other steps, exact match
+    if (step.number !== 2 && step.number !== 3) {
+      return step.path === currentPath;
+    }
+    return false;
+  };
+
   // Sync step store with current route, but only when route doesn't match current step
   useEffect(() => {
-    const matchedStep = ALL_STEPS.find(step => step.path === location.pathname);
+    let matchedStep = null;
+    
+    // Special handling for komoditas routes
+    if (location.pathname.startsWith('/komoditas/')) {
+      // If we're on a /komoditas/* route, set to step 3 (Data Komoditas)
+      matchedStep = ALL_STEPS.find(step => step.number === 3);
+    } else {
+      // For other routes, find exact match
+      matchedStep = ALL_STEPS.find(step => step.path === location.pathname);
+    }
+    
     if (matchedStep && matchedStep.number !== currentStep.number) {
       setStep(matchedStep);
     }
@@ -36,7 +63,8 @@ export function SidebarMenu() {
             {/* Steps */}
             <div className="space-y-3">
               {ALL_STEPS.map((step, index) => {
-                const isActive = currentStep.number === step.number;
+                // Updated logic - prioritize exact path match over wildcard
+                const isActive = (currentStep.number === step.number) || isStepActiveByPath(step, location.pathname);
                 const isCompleted = currentStep.number > step.number;
 
                 return (
@@ -108,7 +136,8 @@ export function SidebarMenu() {
             <div className="flex items-center justify-between">
               {ALL_STEPS.map((step, index) => {
                 const isCompleted = index < currentStep.number - 1;
-                const isActive = index === currentStep.number - 1;
+                // Updated logic for mobile view - prioritize store state over path matching
+                const isActive = (index === currentStep.number - 1) || isStepActiveByPath(step, location.pathname);
 
                 return (
                   <div
@@ -116,7 +145,6 @@ export function SidebarMenu() {
                     className={`flex items-center ${index < ALL_STEPS.length - 1 ? 'flex-1' : ''}`}
                   >
                     <div
-
                       className="relative z-10 flex-shrink-0"
                     >
                       <div className={`w-10 h-10 rounded-lg flex items-center justify-center font-semibold text-sm transition-all duration-300 ${isCompleted ? 'bg-green-600 text-white'
