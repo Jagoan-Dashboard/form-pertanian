@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useMemo } from "react";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
@@ -18,10 +18,16 @@ export default function DataKomoditasPanganView() {
   const { register, formState: { errors }, setValue, getValues, watch, trigger } = useFormContext<FullFormType>();
   const navigate = useNavigate();
 
-  // Set komoditas value to "pangan" when component mounts
+  // Set komoditas value and ensure has_pest_disease initial state when component mounts
   React.useEffect(() => {
     setValue("komoditas", "pangan");
-  }, [setValue]);
+
+    // Ensure has_pest_disease has proper initial value
+    const currentValue = getValues("has_pest_disease");
+    if (currentValue === undefined || currentValue === null) {
+      setValue("has_pest_disease", false);
+    }
+  }, [setValue, getValues]);
 
   // Type guard for pangan-specific errors
   const getFieldError = (fieldName: string) => {
@@ -43,7 +49,12 @@ export default function DataKomoditasPanganView() {
   const foodGrowthPhase = watch("food_growth_phase");
   const foodTechnology = watch("food_technology");
   const foodDelayReason = watch("food_delay_reason");
-  const hasPestDisease = watch("has_pest_disease");
+  const hasPestDisease = watch("has_pest_disease", false);
+
+  // Memoize the Select value to ensure consistent string representation
+  const pestDiseaseSelectValue = useMemo(() => {
+    return hasPestDisease === true ? "ya" : "tidak";
+  }, [hasPestDisease]);
   const pestDiseaseType = watch("pest_disease_type");
   const pestControlAction = watch("pest_control_action");
   const weatherCondition = watch("weather_condition");
@@ -58,37 +69,49 @@ export default function DataKomoditasPanganView() {
   };
 
   const handleNext = async () => {
-    const isValid = await trigger([
-      "food_commodity",
-      "food_land_status",
-      "food_land_area",
-      "food_growth_phase",
-      "food_plant_age",
-      "food_technology",
-      "food_planting_date",
-      "food_harvest_date",
-      "food_delay_reason",
-      "has_pest_disease",
-      "pest_disease_type",
-      "affected_area",
-      "pest_control_action",
-      "weather_condition",
-      "weather_impact",
-    ]);
+    try {
+      console.log('🔍 Validating pangan form data...');
 
-    if (isValid) {
-      navigate("/aspirasi-tani");
+      const isValid = await trigger([
+        "food_commodity",
+        "food_land_status",
+        "food_land_area",
+        "food_growth_phase",
+        "food_plant_age",
+        "food_technology",
+        "food_planting_date",
+        "food_harvest_date",
+        "food_delay_reason",
+        "has_pest_disease",
+        "pest_disease_type",
+        "affected_area",
+        "pest_control_action",
+        "weather_condition",
+        "weather_impact",
+        "photos"
+      ]);
+
+      console.log('🔍 Validation result:', isValid);
+      console.log('🔍 Current errors:', errors);
+
+      if (isValid) {
+        console.log('✅ Pangan form valid, navigating to aspirasi-tani');
+        navigate("/aspirasi-tani");
+      } else {
+        console.log('❌ Pangan form validation failed');
+        // Scroll to first error
+        const errorElement = document.querySelector('.text-red-500');
+        if (errorElement) {
+          errorElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      }
+    } catch (error) {
+      console.error('❌ Error during form validation:', error);
     }
   };
 
 
-  // 1. Debug realtime perubahan field tertentu
-  useEffect(() => {
-    const subscription = watch((value, { name, type }) => {
-      console.log("📌 Field berubah:", name, "Type:", type, "Value:", value);
-    });
-    return () => subscription.unsubscribe();
-  }, [watch]);
+
 
   return (
     <div className="space-y-6">
@@ -365,10 +388,10 @@ export default function DataKomoditasPanganView() {
               // Clear related fields when "tidak" is selected
               if (!hasDisease) {
                 setValue("pest_disease_type", "");
-                setValue("affected_area", undefined);
+                setValue("affected_area", 0);
                 setValue("pest_control_action", "");
               }
-            }} value={hasPestDisease === true ? "ya" : "tidak"}>
+            }} value={pestDiseaseSelectValue}>
               <SelectTrigger className={`w-full h-12 rounded-xl ${getFieldError('has_pest_disease')
                   ? 'border-red-500 focus:ring-red-500'
                   : 'border-gray-200 focus:ring-green-500'

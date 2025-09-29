@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useMemo } from "react";
 import { CalendarIcon } from "lucide-react";
 import { useNavigate } from "react-router";
 import { Button } from "~/components/ui/button";
@@ -11,17 +11,23 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "~
 import { cn } from "~/lib/utils";
 import { Icon } from "@iconify/react";
 import { ImageUpload } from "~/components/ImageUplaod";
-import { useFormContext } from "react-hook-form";
+import { useFormContext, type FieldPath } from "react-hook-form";
 import type { FullFormType } from "~/global-validation/validation-step-schemas";
 
 export default function DataKomoditasPerkebunanView() {
   const { register, formState: { errors }, setValue, getValues, watch, trigger } = useFormContext<FullFormType>();
   const navigate = useNavigate();
 
-  // Set komoditas value to "perkebunan" when component mounts
+  // Set komoditas value and ensure has_pest_disease initial state when component mounts
   useEffect(() => {
     setValue("komoditas", "perkebunan");
-  }, [setValue]);
+
+    // Ensure has_pest_disease has proper initial value
+    const currentValue = getValues("has_pest_disease");
+    if (currentValue === undefined || currentValue === null) {
+      setValue("has_pest_disease", false);
+    }
+  }, [setValue, getValues]);
 
   // Type guard for perkebunan-specific errors
   const getFieldError = (fieldName: string) => {
@@ -44,7 +50,12 @@ export default function DataKomoditasPerkebunanView() {
   const teknologiMetode = watch("plantation_technology");
   const keterlambatanTanamPanen = watch("plantation_delay_reason");
   const masalahProduksi = watch("production_problems");
-  const adaSeranganHama = watch("has_pest_disease");
+  const adaSeranganHama = watch("has_pest_disease", false);
+
+  // Memoize the Select value to ensure consistent string representation
+  const pestDiseaseSelectValue = useMemo(() => {
+    return adaSeranganHama === true ? "ya" : "tidak";
+  }, [adaSeranganHama]);
   const jenisHamaPenyakit = watch("pest_disease_type");
   const luasSeranganHama = watch("affected_area");
   const tindakanPengendalianHama = watch("pest_control_action");
@@ -60,27 +71,45 @@ export default function DataKomoditasPerkebunanView() {
   };
 
   const handleNext = async () => {
-    const isValid = await trigger([
-      "plantation_commodity",
-      "plantation_land_status",
-      "plantation_land_area",
-      "plantation_growth_phase",
-      "plantation_plant_age",
-      "plantation_technology",
-      "plantation_planting_date",
-      "plantation_harvest_date",
-      "plantation_delay_reason",
-      "production_problems",
-      "has_pest_disease",
-      "pest_disease_type",
-      "affected_area",
-      "pest_control_action",
-      "weather_condition",
-      "weather_impact",
-    ]);
+    try {
+      console.log('🔍 Validating perkebunan form data...');
 
-    if (isValid) {
-      navigate("/aspirasi-tani");
+      const isValid = await trigger([
+        "plantation_commodity" as FieldPath<FullFormType>,
+        "plantation_land_status" as FieldPath<FullFormType>,
+        "plantation_land_area" as FieldPath<FullFormType>,
+        "plantation_growth_phase" as FieldPath<FullFormType>,
+        "plantation_plant_age" as FieldPath<FullFormType>,
+        "plantation_technology" as FieldPath<FullFormType>,
+        "plantation_planting_date" as FieldPath<FullFormType>,
+        "plantation_harvest_date" as FieldPath<FullFormType>,
+        "plantation_delay_reason" as FieldPath<FullFormType>,
+        "production_problems" as FieldPath<FullFormType>,
+        "has_pest_disease" as FieldPath<FullFormType>,
+        "pest_disease_type" as FieldPath<FullFormType>,
+        "affected_area" as FieldPath<FullFormType>,
+        "pest_control_action" as FieldPath<FullFormType>,
+        "weather_condition" as FieldPath<FullFormType>,
+        "weather_impact" as FieldPath<FullFormType>,
+        "photos" as FieldPath<FullFormType>
+      ]);
+
+      console.log('🔍 Validation result:', isValid);
+      console.log('🔍 Current errors:', errors);
+
+      if (isValid) {
+        console.log('✅ Perkebunan form valid, navigating to aspirasi-tani');
+        navigate("/aspirasi-tani");
+      } else {
+        console.log('❌ Perkebunan form validation failed');
+        // Scroll to first error
+        const errorElement = document.querySelector('.text-red-500');
+        if (errorElement) {
+          errorElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      }
+    } catch (error) {
+      console.error('❌ Error during form validation:', error);
     }
   };
 
@@ -400,10 +429,10 @@ export default function DataKomoditasPerkebunanView() {
               // Clear related fields when "tidak" is selected
               if (!hasDisease) {
                 setValue("pest_disease_type", "");
-                setValue("affected_area", undefined);
+                setValue("affected_area", 0);
                 setValue("pest_control_action", "");
               }
-            }} value={adaSeranganHama === true ? "ya" : "tidak"}>
+            }} value={pestDiseaseSelectValue}>
               <SelectTrigger className={`w-full h-12 rounded-xl ${
                 getFieldError('has_pest_disease') 
                   ? 'border-red-500 focus:ring-red-500' 

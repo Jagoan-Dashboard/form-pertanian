@@ -23,7 +23,26 @@ export const dataKomoditasPanganSchema = z.object({
 
   food_delay_reason: z.string().nonempty("Keterangan wajib diisi"),
 
-  photos: z.union([z.instanceof(File), z.string()]).optional(),
+  photos: z
+    .any()
+    .refine(
+      (file) => file instanceof File || file === null || file === undefined,
+      "Foto Lokasi harus berupa file gambar"
+    )
+    .refine(
+      (file) => {
+        if (!file) return false; // Required field
+        return file.size <= 5 * 1024 * 1024; // 5MB max
+      },
+      "Ukuran foto tidak boleh lebih dari 5MB"
+    )
+    .refine(
+      (file) => {
+        if (!file) return false;
+        return ['image/jpeg', 'image/jpg', 'image/png'].includes(file.type);
+      },
+      "Format foto harus JPG, JPEG, atau PNG"
+    ),
 
   has_pest_disease: z.boolean({
     message: "Ada Serangan Hama wajib dipilih"

@@ -45,9 +45,12 @@ export default function AspirasiTaniView() {
       const isValid = await trigger(['main_constraint', 'farmer_hope', 'training_needed', 'urgent_needs', 'water_access', 'suggestions']);
 
       if (isValid) {
-        // Submit all form data
-        console.log('Submitting all form data:', watch());
-        await submitForm();
+        // Submit all form data - get data from the same context we're using
+        const allFormData = watch();
+        console.log('🔍 AspirasiTani - All form data:', allFormData);
+
+        // Submit using submitForm and pass the current context data
+        await submitForm(allFormData);
 
         // Show success alert
         setShowAlert(true);

@@ -8,7 +8,8 @@ import type { FullFormType } from "~/global-validation/validation-step-schemas";
 export function FormWrapper({ children }: { children: React.ReactNode }) {
   const methods = useForm<FullFormType>({
     resolver: zodResolver(fullSchema),
-    mode: "onChange",
+    mode: "onSubmit", // Changed from "onChange" to prevent aggressive validation
+    reValidateMode: "onChange",
   });
 
   return (

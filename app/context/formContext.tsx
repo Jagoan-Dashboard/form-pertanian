@@ -1,5 +1,7 @@
 import { createContext, useContext, type ReactNode } from 'react';
 import { useForm, type UseFormReturn } from 'react-hook-form';
+import apiClient from '~/lib/api-client';
+import { ENDPOINTS } from '~/lib/api-endpoints';
 
 // Form Data Interface
 interface FormPertanianData {
@@ -15,6 +17,7 @@ interface FormPertanianData {
 
   // Step 2 - Komoditas Selection
   selectedKomoditas: 'pangan' | 'hortikultura' | 'perkebunan' | '';
+  komoditas?: 'pangan' | 'hortikultura' | 'perkebunan'; // For discriminated union
 
   // Perkebunan (Step 2/3)
   plantation_commodity?: string;
@@ -75,7 +78,7 @@ interface FormPertanianData {
 // Context Type
 interface FormPertanianContextType {
   methods: UseFormReturn<FormPertanianData>;
-  submitForm: () => Promise<void>;
+  submitForm: (data?: any) => Promise<void>;
   isSubmitting: boolean;
 }
 
@@ -91,7 +94,6 @@ interface FormPertanianProviderProps {
 
 export function FormPertanianProvider({
   children,
-  apiEndpoint = '/api/form-pertanian',
   onSubmitSuccess,
   onSubmitError,
 }: FormPertanianProviderProps) {
@@ -109,6 +111,7 @@ export function FormPertanianProvider({
 
       // Step 2
       selectedKomoditas: '',
+      komoditas: undefined,
 
       // Step 3 Universal
       has_pest_disease: false,
@@ -134,37 +137,31 @@ export function FormPertanianProvider({
 
   const { formState } = methods;
 
-  const submitForm = async () => {
-    const allData = methods.getValues();
+  const submitForm = async (externalData?: any) => {
+    // Use external data if provided, otherwise use internal methods
+    const allData = externalData || methods.getValues();
 
     try {
+      console.log("🔍 Raw form data (external/internal):", allData);
+
       const payload = prepareFormData(allData);
 
-      // Console log the prepared data for now (as requested by user)
-      console.log('🚀 Submitting Form Data:', payload);
-      console.log('📊 Raw Form Data:', allData);
+      console.log("🚀 Submitting Form Data (after prepare):", payload);
 
-      // Simulate API call delay
-      // await new Promise(resolve => setTimeout(resolve, 1000));
+      // Tunggu hasil API
+      const result = await apiClient.post(ENDPOINTS.CREATE_REPORT, payload);
 
-      // For now, just simulate success response
-      // const result = {
-      //   success: true,
-      //   message: 'Form submitted successfully',
-      //   data: payload,
-      //   timestamp: new Date().toISOString()
-      // };
+      console.log("✅ Submission Success:", result);
 
-      // console.log('✅ Submission Success:', result);
-
+      // Callback jika ada
       // if (onSubmitSuccess) {
       //   onSubmitSuccess(result);
       // }
 
-      // Reset the form after successful submission
+      // Reset form ke default values
       methods.reset();
     } catch (error) {
-      console.error('❌ Form submission error:', error);
+      console.error("❌ Form submission error:", error);
 
       if (onSubmitError) {
         onSubmitError(error);
@@ -174,7 +171,9 @@ export function FormPertanianProvider({
     }
   };
 
-  const prepareFormData = (data: FormPertanianData) => {
+
+  const prepareFormData = (data: any) => {
+    // Handle data from both FormPertanianData and FullFormType structures
     const baseData = {
       lat: data.lat,
       long: data.long,
@@ -185,6 +184,7 @@ export function FormPertanianProvider({
       village: data.village,
       district: data.district,
       selectedKomoditas: data.selectedKomoditas,
+      komoditas: data.komoditas,
     };
 
     const universalStep3 = {

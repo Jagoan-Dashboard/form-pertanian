@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useMemo } from "react";
 import { CalendarIcon } from "lucide-react";
 import { useNavigate } from "react-router";
 import { Button } from "~/components/ui/button";
@@ -11,17 +11,23 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "~
 import { cn } from "~/lib/utils";
 import { Icon } from "@iconify/react";
 import { ImageUpload } from "~/components/ImageUplaod";
-import { useFormContext } from "react-hook-form";
+import { useFormContext, type FieldPath } from "react-hook-form";
 import type { FullFormType } from "~/global-validation/validation-step-schemas";
 
 export default function DataKomoditasHortikulturaView() {
   const { register, formState: { errors }, setValue, getValues, watch, trigger } = useFormContext<FullFormType>();
   const navigate = useNavigate();
 
-  // Set komoditas value to "hortikultura" when component mounts
+  // Set komoditas value and ensure has_pest_disease initial state when component mounts
   useEffect(() => {
     setValue("komoditas", "hortikultura");
-  }, [setValue]);
+
+    // Ensure has_pest_disease has proper initial value
+    const currentValue = getValues("has_pest_disease");
+    if (currentValue === undefined || currentValue === null) {
+      setValue("has_pest_disease", false);
+    }
+  }, [setValue, getValues]);
 
   // Type guard for hortikultura-specific errors
   const getFieldError = (fieldName: string) => {
@@ -45,7 +51,12 @@ export default function DataKomoditasHortikulturaView() {
   const teknologiMetode = watch("horti_technology");
   const keterlambatanTanamPanen = watch("horti_delay_reason");
   const masalahPascapanen = watch("post_harvest_problems");
-  const adaSeranganHama = watch("has_pest_disease");
+  const adaSeranganHama = watch("has_pest_disease", false);
+
+  // Memoize the Select value to ensure consistent string representation
+  const pestDiseaseSelectValue = useMemo(() => {
+    return adaSeranganHama === true ? "ya" : "tidak";
+  }, [adaSeranganHama]);
   const jenisHamaPenyakit = watch("pest_disease_type");
   const luasSeranganHama = watch("affected_area");
   const tindakanPengendalianHama = watch("pest_control_action");
@@ -61,28 +72,69 @@ export default function DataKomoditasHortikulturaView() {
   };
 
   const handleNext = async () => {
-    const isValid = await trigger([
-      "horti_commodity",
-      "horti_sub_commodity",
-      "horti_land_status",
-      "horti_land_area",
-      "horti_growth_phase",
-      "horti_plant_age",
-      "horti_technology",
-      "horti_planting_date",
-      "horti_harvest_date",
-      "horti_delay_reason",
-      "post_harvest_problems",
-      "has_pest_disease",
-      "pest_disease_type",
-      "affected_area",
-      "pest_control_action",
-      "weather_condition",
-      "weather_impact",
-    ]);
+    try {
+      console.log('🚀 DataKomoditasHoltikultura - Starting validation...');
 
-    if (isValid) {
-      navigate("/aspirasi-tani");
+      const fieldsToValidate: FieldPath<FullFormType>[] = [
+        "horti_commodity",
+        "horti_sub_commodity",
+        "horti_land_status",
+        "horti_land_area",
+        "horti_growth_phase",
+        "horti_plant_age",
+        "horti_technology",
+        "horti_planting_date",
+        "horti_harvest_date",
+        "horti_delay_reason",
+        "post_harvest_problems",
+        "photos",
+        "has_pest_disease",
+        "pest_disease_type",
+        "affected_area",
+        "pest_control_action",
+        "weather_condition",
+        "weather_impact",
+      ];
+
+      const isValid = await trigger(fieldsToValidate);
+
+      console.log('📋 DataKomoditasHoltikultura - Validation result:', isValid);
+      console.log('🔍 DataKomoditasHoltikultura - Current errors:', errors);
+
+      if (isValid) {
+        console.log('✅ DataKomoditasHoltikultura - Validation passed, navigating to aspirasi-tani');
+        navigate("/aspirasi-tani");
+      } else {
+        console.log('❌ DataKomoditasHoltikultura - Validation failed');
+
+        // Find first error field and scroll to it
+        const firstErrorField = fieldsToValidate.find(field =>
+          errors[field as keyof typeof errors]
+        );
+
+        if (firstErrorField) {
+          console.log('🎯 DataKomoditasHoltikultura - First error field:', firstErrorField);
+
+          // Find and scroll to the error element
+          const errorElement = document.querySelector(`[name="${firstErrorField}"]`) ||
+                              document.querySelector(`input[name="${firstErrorField}"]`) ||
+                              document.querySelector(`select[name="${firstErrorField}"]`) ||
+                              document.querySelector(`textarea[name="${firstErrorField}"]`);
+
+          if (errorElement) {
+            errorElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            console.log('📍 DataKomoditasHoltikultura - Scrolled to error field:', firstErrorField);
+          } else {
+            console.log('⚠️ DataKomoditasHoltikultura - Could not find error element for:', firstErrorField);
+          }
+        }
+
+        // Show user feedback
+        const errorCount = Object.keys(errors).length;
+        console.log(`🚨 DataKomoditasHoltikultura - Please fix ${errorCount} validation error(s) before continuing`);
+      }
+    } catch (error) {
+      console.error('💥 DataKomoditasHoltikultura - Error in handleNext:', error);
     }
   };
 
@@ -461,10 +513,10 @@ export default function DataKomoditasHortikulturaView() {
               // Clear related fields when "tidak" is selected
               if (!hasDisease) {
                 setValue("pest_disease_type", "");
-                setValue("affected_area", undefined);
+                setValue("affected_area", 0);
                 setValue("pest_control_action", "");
               }
-            }} value={adaSeranganHama === true ? "ya" : "tidak"}>
+            }} value={pestDiseaseSelectValue}>
               <SelectTrigger className={`w-full h-12 rounded-xl ${
                 getFieldError('has_pest_disease') 
                   ? 'border-red-500 focus:ring-red-500' 
