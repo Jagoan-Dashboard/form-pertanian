@@ -16,9 +16,9 @@ export default function KomoditasView() {
 
   const selectedKomoditas = watch("selectedKomoditas"); // ambil dari form
   const komoditasList: KomoditasType[] = [
-    { id: "pangan", name: "Pangan", icon: "streamline-plump:wheat-solid", navigate: "/data-komoditas-pangan" },
-    { id: "hortikultura", name: "Hortikultura", icon: "ri:plant-fill", navigate: "/data-komoditas-hortikultura" },
-    { id: "perkebunan", name: "Perkebunan", icon: "mdi:seed", navigate: "/data-komoditas-perkebunan" }
+    { id: "pangan", name: "Pangan", icon: "streamline-plump:wheat-solid", navigate: "/komoditas/pangan" },
+    { id: "hortikultura", name: "Hortikultura", icon: "ri:plant-fill", navigate: "/komoditas/hortikultura" },
+    { id: "perkebunan", name: "Perkebunan", icon: "mdi:seed", navigate: "/komoditas/perkebunan" }
   ];
 
   const handleSelect = (id: "pangan" | "hortikultura" | "perkebunan") => {
@@ -60,7 +60,7 @@ export default function KomoditasView() {
           return (
             <button
               key={komoditas.id}
-              onClick={() => handleSelect(komoditas.id)}
+              onClick={() => handleSelect(komoditas.id as "pangan" | "hortikultura" | "perkebunan")}
               type="button"
               className={`p-6 rounded-2xl border-2 transition-all duration-200 ${
                 isSelected
