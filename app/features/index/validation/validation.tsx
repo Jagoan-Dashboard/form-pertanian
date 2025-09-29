@@ -3,7 +3,7 @@ import { z } from "zod";
 // Validation schema for the IndexView form data
 export const indexViewSchema = z.object({
   // Coordinates validation
-  latitude: z
+  lat: z
     .string()
     .min(1, "Latitude wajib diisi")
     .refine(
@@ -14,7 +14,7 @@ export const indexViewSchema = z.object({
       "Latitude harus berupa angka antara -90 dan 90"
     ),
 
-  longitude: z
+  long: z
     .string()
     .min(1, "Longitude wajib diisi")
     .refine(
@@ -26,7 +26,7 @@ export const indexViewSchema = z.object({
     ),
 
   // Data Penyuluh validation
-  namaPenyuluh: z
+  extension_officer: z
     .string()
     .min(1, "Nama Penyuluh wajib diisi")
     .max(100, "Nama Penyuluh tidak boleh lebih dari 100 karakter")
@@ -34,7 +34,7 @@ export const indexViewSchema = z.object({
       "Nama Penyuluh hanya boleh berisi huruf dan spasi"
     ),
 
-  tanggalKunjungan: z
+  visit_date: z
     .string()
     .min(1, "Tanggal Kunjungan wajib dipilih")
     .refine(
@@ -45,16 +45,13 @@ export const indexViewSchema = z.object({
       "Tanggal Kunjungan tidak boleh di masa depan"
     ),
 
-
-
-  namaPetani: z
+  farmer_name: z
     .string()
     .min(1, "Nama Petani wajib diisi")
     .max(100, "Nama Petani tidak boleh lebih dari 100 karakter")
-    .regex(/^[\p{L}\s'.-]+$/u, "Nama hanya boleh huruf, spasi, titik, apostrof, dan tanda hubung")
-  ,
+    .regex(/^[\p{L}\s'.-]+$/u, "Nama hanya boleh huruf, spasi, titik, apostrof, dan tanda hubung"),
 
-  namaKelompokTani: z
+  farmer_group: z
     .string()
     .min(1, "Nama Kelompok Tani wajib diisi")
     .max(100, "Nama Kelompok Tani tidak boleh lebih dari 100 karakter")
@@ -62,9 +59,13 @@ export const indexViewSchema = z.object({
       "Nama Kelompok Tani hanya boleh berisi huruf, angka, spasi, tanda hubung, dan titik"
     ),
 
-  desaKecamatan: z
+  village: z
     .string()
-    .min(1, "Desa/Kecamatan wajib dipilih"),
+    .min(1, "Desa wajib dipilih"),
+
+  district: z
+    .string()
+    .min(1, "Kecamatan wajib dipilih"),
 });
 
 export type IndexViewFormData = z.infer<typeof indexViewSchema>;

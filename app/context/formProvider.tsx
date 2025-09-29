@@ -25,6 +25,7 @@ export function FormProvider({ children }: { children: React.ReactNode }) {
     defaultValues: {
       affected_area: 0,
       has_pest_disease: false,
+      district: "Ngawi",
     },
   });
   const navigate = useNavigate();
