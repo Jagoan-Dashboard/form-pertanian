@@ -9,11 +9,12 @@ import { SuccessAlert } from "~/components/SuccesAlert";
 import { checkFieldConsistency, getCharacterCount } from "./validation/validation";
 import { useFormContext } from "react-hook-form";
 import { useFormPertanian } from "~/context/formContext";
+import { useFormContextHook } from "~/context/formProvider";
 
 export default function AspirasiTaniView() {
   const navigate = useNavigate();
   const { watch, setValue, formState: { errors }, trigger } = useFormContext();
-  const { submitForm, isSubmitting } = useFormPertanian();
+  const { submitForm, isSubmitting } = useFormContextHook();
   const [showAlert, setShowAlert] = useState(false);
   const [isSubmittingForm, setIsSubmittingForm] = useState(false);
 
@@ -49,9 +50,8 @@ export default function AspirasiTaniView() {
         const allFormData = watch();
         console.log('🔍 AspirasiTani - All form data:', allFormData);
 
-        // Submit using submitForm and pass the current context data
-        await submitForm(allFormData);
-
+              // Submit using submitForm
+              await submitForm();
         // Show success alert
         setShowAlert(true);
 

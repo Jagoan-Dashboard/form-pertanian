@@ -136,7 +136,7 @@ export function FormPertanianProvider({
   const navigate = useNavigate();
 
   const submitForm = async () => {
-    const allData = methods.getValues();
+    const allData = methods.getValues(); //mengapa ini selalu mengembalikan default values? bukan yang diisi oleh user?
 
     try {
       const payload = prepareFormData(allData);
