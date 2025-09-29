@@ -30,41 +30,41 @@ export function FormProvider({ children }: { children: React.ReactNode }) {
   const navigate = useNavigate();
 
   const submitForm = async () => {
-    await methods.handleSubmit(async (data) => {
-      try {
-        const formData = new FormData();
-        Object.entries(data).forEach(([key, value]) => {
-          if (key === 'photos' && value instanceof File) {
-            formData.append(key, value);
-          } else if (value !== undefined && value !== null) {
-            formData.append(key, String(value));
-          }
-        });
-
-        console.log("🚀 Submitting Form Data:", Object.fromEntries(formData.entries()));
-
-        const result = await apiClient.post(
-          ENDPOINTS.CREATE_REPORT,
-          formData,
-          {
-            headers: {
-              "Content-Type": "multipart/form-data",
-            },
-          }
-        );
-
-        console.log("✅ Submission Success:", result);
-        methods.reset();
-        setTimeout(() => {
-          navigate("/");
-        }, 2000);
-
-      } catch (error) {
-        console.error("❌ Form submission error:", error);
-        throw error;
-      }
-    })();
+    try {
+      const formData = new FormData();
+  
+      const formatDate = (value?: string | Date) => {
+        if (!value) return "";
+        const d = new Date(value);
+        return isNaN(d.getTime()) ? "" : d.toISOString().split("T")[0];
+      };
+  
+      Object.entries(methods.watch()).forEach(([key, value]) => {
+        if (["visit_date","food_planting_date","food_harvest_date",
+             "horti_planting_date","horti_harvest_date", 
+             "plantation_planting_date","plantation_harvest_date"].includes(key)) {
+          const formatted = formatDate(value);
+          if (formatted) formData.append(key, formatted);
+        } else if (key === "photos") {
+          if (value instanceof File) formData.append(key, value);
+          else if (Array.isArray(value)) value.forEach((file, idx) => file instanceof File && formData.append(`photos[${idx}]`, file));
+        } else if (value !== undefined && value !== null && value !== "") {
+          formData.append(key, String(value));
+        }
+      });
+  
+      await apiClient.post(ENDPOINTS.CREATE_REPORT, formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+  
+      methods.reset();
+      navigate("/");
+  
+    } catch (error) {
+      console.error("Form submission error:", error);
+    }
   };
+  
 
   return (
     <FormContext.Provider value={{ methods, submitForm, isSubmitting: methods.formState.isSubmitting }}>

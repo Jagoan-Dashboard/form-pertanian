@@ -188,7 +188,7 @@ export function FormPertanianProvider({
       lat: data.lat,
       long: data.long,
       extension_officer: data.extension_officer,
-      visit_date: formatDate(data.visit_date || data.tanggalKunjungan),
+      visit_date: formatDate(data.visit_date),
       farmer_name: data.farmer_name,
       farmer_group: data.farmer_group,
       village: data.village,
