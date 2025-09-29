@@ -140,49 +140,31 @@ export function FormPertanianProvider({
     try {
       const payload = prepareFormData(allData);
 
-      const formData = new FormData();
+      // Console log the prepared data for now (as requested by user)
+      console.log('🚀 Submitting Form Data:', payload);
+      console.log('📊 Raw Form Data:', allData);
 
-      Object.entries(payload).forEach(([key, value]) => {
-        if (key === 'photos') return;
-        if (value === undefined || value === null || value === '') return;
+      // Simulate API call delay
+      // await new Promise(resolve => setTimeout(resolve, 1000));
 
-        if (value instanceof Date) {
-          formData.append(key, value.toISOString());
-        } else if (typeof value === 'object' && !(value instanceof File)) {
-          formData.append(key, JSON.stringify(value));
-        } else {
-          formData.append(key, String(value));
-        }
-      });
+      // For now, just simulate success response
+      // const result = {
+      //   success: true,
+      //   message: 'Form submitted successfully',
+      //   data: payload,
+      //   timestamp: new Date().toISOString()
+      // };
 
-      if (Array.isArray(payload.photos) && payload.photos.length > 0) {
-        payload.photos.forEach((photo, index) => {
-          if (photo instanceof File) {
-            formData.append(`photos[${index}]`, photo);
-          } else if (typeof photo === 'string' && photo) {
-            formData.append(`photos[${index}]`, photo);
-          }
-        });
-      }
+      // console.log('✅ Submission Success:', result);
 
-      const response = await fetch(apiEndpoint, {
-        method: 'POST',
-        body: formData,
-      });
+      // if (onSubmitSuccess) {
+      //   onSubmitSuccess(result);
+      // }
 
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      const result = await response.json();
-
-      if (onSubmitSuccess) {
-        onSubmitSuccess(result);
-      }
-
+      // Reset the form after successful submission
       methods.reset();
     } catch (error) {
-      console.error('Form submission error:', error);
+      console.error('❌ Form submission error:', error);
 
       if (onSubmitError) {
         onSubmitError(error);

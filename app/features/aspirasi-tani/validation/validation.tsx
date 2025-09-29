@@ -3,28 +3,28 @@ import { z } from "zod";
 // Validation schema for Aspirasi dan Kebutuhan Petani form
 export const aspirasiTaniSchema = z.object({
   // Aspirasi dan Kebutuhan Petani Section
-  kendalaUtama: z
+  main_constraint: z
     .string()
     .min(1, "Kendala Utama wajib dipilih"),
 
-  harapan: z
+  farmer_hope: z
     .string()
     .min(1, "Harapan wajib dipilih"),
 
-  pelatihanDibutuhkan: z
+  training_needed: z
     .string()
     .min(1, "Pelatihan yang Dibutuhkan wajib dipilih"),
 
-  kebutuhanMendesak: z
+  urgent_needs: z
     .string()
     .min(1, "Kebutuhan Mendesak wajib dipilih"),
 
-  aksesAir: z
+  water_access: z
     .string()
     .min(1, "Akses Air Pertanian (P2T) wajib dipilih"),
 
   // Harapan di Masa Depan Section (Optional)
-  harapanMasaDepan: z
+  suggestions: z
     .string()
     .optional()
     .refine(
@@ -49,22 +49,22 @@ export const aspirasiTaniSchema = z.object({
     ),
 }).refine(
   (data) => {
-    // Validation: Jika kendala utama adalah "air", aksesAir tidak boleh "baik"
-    if (data.kendalaUtama === "air" && data.aksesAir === "baik") {
+    // Validation: Jika kendala utama adalah "air", water_access tidak boleh "baik"
+    if (data.main_constraint === "air" && data.water_access === "baik") {
       return false;
     }
     return true;
   },
   {
     message: "Jika kendala utama adalah kekurangan air, akses air tidak bisa 'Baik - Tersedia Sepanjang Tahun'",
-    path: ["aksesAir"],
+    path: ["water_access"],
   }
 ).refine(
   (data) => {
-    // Validation: Jika aksesAir terbatas atau tidak ada, kebutuhan mendesak sebaiknya irigasi
-    if ((data.aksesAir === "terbatas" || data.aksesAir === "tidak-ada") && 
-        data.kendalaUtama !== "air" && 
-        data.kebutuhanMendesak !== "irigasi") {
+    // Validation: Jika water_access terbatas atau tidak ada, kebutuhan mendesak sebaiknya irigasi
+    if ((data.water_access === "terbatas" || data.water_access === "tidak-ada") &&
+        data.main_constraint !== "air" &&
+        data.urgent_needs !== "irigasi") {
       // This is a warning, not a hard validation error
       // We can add this as optional validation
       return true;
@@ -73,7 +73,7 @@ export const aspirasiTaniSchema = z.object({
   },
   {
     message: "Pertimbangkan untuk memilih 'Perbaikan Irigasi' sebagai kebutuhan mendesak",
-    path: ["kebutuhanMendesak"],
+    path: ["urgent_needs"],
   }
 ).refine(
   (data) => {
@@ -85,9 +85,9 @@ export const aspirasiTaniSchema = z.object({
       "pasar": ["modal", "alat"],
     };
 
-    if (data.harapan && data.kebutuhanMendesak) {
-      const expectedNeeds = consistencyMap[data.harapan];
-      if (expectedNeeds && !expectedNeeds.includes(data.kebutuhanMendesak)) {
+    if (data.farmer_hope && data.urgent_needs) {
+      const expectedNeeds = consistencyMap[data.farmer_hope];
+      if (expectedNeeds && !expectedNeeds.includes(data.urgent_needs)) {
         // This is a soft validation - we allow it but could warn
         return true;
       }
@@ -96,7 +96,7 @@ export const aspirasiTaniSchema = z.object({
   },
   {
     message: "Harapan dan kebutuhan mendesak sebaiknya konsisten",
-    path: ["kebutuhanMendesak"],
+    path: ["urgent_needs"],
   }
 );
 
@@ -104,12 +104,12 @@ export type AspirasiTaniFormData = z.infer<typeof aspirasiTaniSchema>;
 
 // Optional: Individual field validations for real-time validation
 export const fieldValidations = {
-  kendalaUtama: z.string().min(1, "Kendala Utama wajib dipilih"),
-  harapan: z.string().min(1, "Harapan wajib dipilih"),
-  pelatihanDibutuhkan: z.string().min(1, "Pelatihan yang Dibutuhkan wajib dipilih"),
-  kebutuhanMendesak: z.string().min(1, "Kebutuhan Mendesak wajib dipilih"),
-  aksesAir: z.string().min(1, "Akses Air Pertanian (P2T) wajib dipilih"),
-  harapanMasaDepan: z.string().optional().refine(
+  main_constraint: z.string().min(1, "Kendala Utama wajib dipilih"),
+  farmer_hope: z.string().min(1, "Harapan wajib dipilih"),
+  training_needed: z.string().min(1, "Pelatihan yang Dibutuhkan wajib dipilih"),
+  urgent_needs: z.string().min(1, "Kebutuhan Mendesak wajib dipilih"),
+  water_access: z.string().min(1, "Akses Air Pertanian (P2T) wajib dipilih"),
+  suggestions: z.string().optional().refine(
     (val) => {
       if (val && val.trim().length > 0) {
         return val.trim().length >= 20 && val.trim().length <= 1000;
@@ -132,15 +132,15 @@ export const getCharacterCount = (text: string): { current: number; min: number;
 };
 
 // Helper function to check consistency between fields
-export const checkFieldConsistency = (kendalaUtama: string, aksesAir: string): { isConsistent: boolean; warning?: string } => {
-  if (kendalaUtama === "air" && aksesAir === "baik") {
+export const checkFieldConsistency = (main_constraint: string, water_access: string): { isConsistent: boolean; warning?: string } => {
+  if (main_constraint === "air" && water_access === "baik") {
     return {
       isConsistent: false,
       warning: "Jika kendala utama adalah kekurangan air, akses air seharusnya tidak 'Baik'"
     };
   }
-  
-  if (kendalaUtama === "air" && (aksesAir === "terbatas" || aksesAir === "tidak-ada")) {
+
+  if (main_constraint === "air" && (water_access === "terbatas" || water_access === "tidak-ada")) {
     return {
       isConsistent: true
     };
@@ -150,22 +150,22 @@ export const checkFieldConsistency = (kendalaUtama: string, aksesAir: string): {
 };
 
 // Helper function to suggest consistent selections
-export const getSuggestedKebutuhanMendesak = (kendalaUtama: string, harapan: string, aksesAir: string): string[] => {
+export const getSuggestedKebutuhanMendesak = (main_constraint: string, farmer_hope: string, water_access: string): string[] => {
   const suggestions: string[] = [];
 
-  if (kendalaUtama === "air" || aksesAir === "terbatas" || aksesAir === "tidak-ada") {
+  if (main_constraint === "air" || water_access === "terbatas" || water_access === "tidak-ada") {
     suggestions.push("irigasi");
   }
-  
-  if (kendalaUtama === "modal" || harapan === "bantuan-modal") {
+
+  if (main_constraint === "modal" || farmer_hope === "bantuan-modal") {
     suggestions.push("modal");
   }
-  
-  if (kendalaUtama === "pupuk" || harapan === "subsidi") {
+
+  if (main_constraint === "pupuk" || farmer_hope === "subsidi") {
     suggestions.push("pupuk");
   }
-  
-  if (kendalaUtama === "hama") {
+
+  if (main_constraint === "hama") {
     suggestions.push("pestisida");
   }
 

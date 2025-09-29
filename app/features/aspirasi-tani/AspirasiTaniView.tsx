@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Icon } from "@iconify/react";
 import { Button } from "~/components/ui/button";
 import { Label } from "~/components/ui/label";
@@ -6,65 +6,63 @@ import { Textarea } from "~/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "~/components/ui/select";
 import { useNavigate } from "react-router";
 import { SuccessAlert } from "~/components/SuccesAlert";
-import { aspirasiTaniSchema, checkFieldConsistency, getCharacterCount, type AspirasiTaniFormData } from "./validation/validation";
-import { z } from "zod";
+import { checkFieldConsistency, getCharacterCount } from "./validation/validation";
+import { useFormContext } from "react-hook-form";
+import { useFormPertanian } from "~/context/formContext";
 
 export default function AspirasiTaniView() {
-
   const navigate = useNavigate();
-  const [formData, setFormData] = useState<AspirasiTaniFormData>({
-    kendalaUtama: '',
-    harapan: '',
-    pelatihanDibutuhkan: '',
-    kebutuhanMendesak: '',
-    aksesAir: '',
-    harapanMasaDepan: ''
-  });
-  const [errors, setErrors] = useState<Record<string, string>>({});
+  const { watch, setValue, formState: { errors }, trigger } = useFormContext();
+  const { submitForm, isSubmitting } = useFormPertanian();
   const [showAlert, setShowAlert] = useState(false);
+  const [isSubmittingForm, setIsSubmittingForm] = useState(false);
 
-  // Function to validate the form
-  const validateForm = () => {
+  // Watch form values
+  const main_constraint = watch('main_constraint');
+  const farmer_hope = watch('farmer_hope');
+  const training_needed = watch('training_needed');
+  const urgent_needs = watch('urgent_needs');
+  const water_access = watch('water_access');
+  const suggestions = watch('suggestions');
+
+  // Helper functions for error handling
+  const getFieldError = (fieldName: string) => {
+    return errors[fieldName as keyof typeof errors];
+  };
+
+  const getErrorMessage = (fieldName: string): string | undefined => {
+    const error = getFieldError(fieldName);
+    if (error && typeof error === 'object' && 'message' in error) {
+      return typeof error.message === 'string' ? error.message : String(error.message);
+    }
+    return undefined;
+  };
+
+  const handleSubmit = async () => {
+    setIsSubmittingForm(true);
     try {
-      aspirasiTaniSchema.parse(formData);
-      setErrors({});
-      return true;
-    } catch (error) {
-      if (error instanceof z.ZodError) {
-        const newErrors: Record<string, string> = {};
-        error.issues.forEach((err) => {
-          if (err.path && err.path.length > 0) {
-            const fieldName = err.path[0] as string;
-            newErrors[fieldName] = err.message;
-          }
-        });
-        setErrors(newErrors);
-        console.log('Validation errors:', newErrors);
-        return false;
+      // Validate current step
+      const isValid = await trigger(['main_constraint', 'farmer_hope', 'training_needed', 'urgent_needs', 'water_access', 'suggestions']);
+
+      if (isValid) {
+        // Submit all form data
+        console.log('Submitting all form data:', watch());
+        await submitForm();
+
+        // Show success alert
+        setShowAlert(true);
+
+        // Navigate to home after 2 seconds
+        setTimeout(() => {
+          navigate('/');
+        }, 2000);
+      } else {
+        console.log('Validation failed:', errors);
       }
-      return false;
-    }
-  };
-
-
-  const handleSubmit = () => {
-    if (validateForm()) {
-      console.log("Form submitted:", formData);
-      // Handle submit logic here
-      setShowAlert(true);
-    } else {
-      console.log("Validation failed:", errors);
-    }
-  };
-
-  // Function to clear specific error when field is updated
-  const clearError = (fieldName: string) => {
-    if (errors[fieldName]) {
-      setErrors(prev => {
-        const newErrors = { ...prev };
-        delete newErrors[fieldName];
-        return newErrors;
-      });
+    } catch (error) {
+      console.error('Submission error:', error);
+    } finally {
+      setIsSubmittingForm(false);
     }
   };
 
@@ -90,13 +88,13 @@ export default function AspirasiTaniView() {
                 Kendala Utama*
               </Label>
               <Select
-                value={formData.kendalaUtama}
+                value={main_constraint || ''}
                 onValueChange={(value) => {
-                  setFormData({ ...formData, kendalaUtama: value });
-                  clearError('kendalaUtama');
+                  setValue('main_constraint', value);
+                  trigger('main_constraint');
                 }}
               >
-                <SelectTrigger className={`w-full h-12 rounded-xl ${errors.kendalaUtama ? 'border-red-500' : 'border-gray-200'}`}>
+                <SelectTrigger className={`w-full h-12 rounded-xl ${getFieldError('main_constraint') ? 'border-red-500' : 'border-gray-200'}`}>
                   <SelectValue placeholder="Pilih Kendala Utama" />
                 </SelectTrigger>
                 <SelectContent>
@@ -108,8 +106,8 @@ export default function AspirasiTaniView() {
                   <SelectItem value="lainnya">Lainnya</SelectItem>
                 </SelectContent>
               </Select>
-              {errors.kendalaUtama && (
-                <p className="text-red-500 text-sm mt-1">{errors.kendalaUtama}</p>
+              {getFieldError('main_constraint') && (
+                <p className="text-red-500 text-sm mt-1">{getErrorMessage('main_constraint')}</p>
               )}
             </div>
 
@@ -119,13 +117,13 @@ export default function AspirasiTaniView() {
                 Harapan*
               </Label>
               <Select
-                value={formData.harapan}
+                value={farmer_hope || ''}
                 onValueChange={(value) => {
-                  setFormData({ ...formData, harapan: value });
-                  clearError('harapan');
+                  setValue('farmer_hope', value);
+                  trigger('farmer_hope');
                 }}
               >
-                <SelectTrigger className={`w-full h-12 rounded-xl ${errors.harapan ? 'border-red-500' : 'border-gray-200'}`}>
+                <SelectTrigger className={`w-full h-12 rounded-xl ${getFieldError('farmer_hope') ? 'border-red-500' : 'border-gray-200'}`}>
                   <SelectValue placeholder="Pilih Harapan" />
                 </SelectTrigger>
                 <SelectContent>
@@ -137,8 +135,8 @@ export default function AspirasiTaniView() {
                   <SelectItem value="lainnya">Lainnya</SelectItem>
                 </SelectContent>
               </Select>
-              {errors.harapan && (
-                <p className="text-red-500 text-sm mt-1">{errors.harapan}</p>
+              {getFieldError('farmer_hope') && (
+                <p className="text-red-500 text-sm mt-1">{getErrorMessage('farmer_hope')}</p>
               )}
             </div>
 
@@ -148,13 +146,13 @@ export default function AspirasiTaniView() {
                 Pelatihan yang Dibutuhkan*
               </Label>
               <Select
-                value={formData.pelatihanDibutuhkan}
+                value={training_needed || ''}
                 onValueChange={(value) => {
-                  setFormData({ ...formData, pelatihanDibutuhkan: value });
-                  clearError('pelatihanDibutuhkan');
+                  setValue('training_needed', value);
+                  trigger('training_needed');
                 }}
               >
-                <SelectTrigger className={`w-full h-12 rounded-xl ${errors.pelatihanDibutuhkan ? 'border-red-500' : 'border-gray-200'}`}>
+                <SelectTrigger className={`w-full h-12 rounded-xl ${getFieldError('training_needed') ? 'border-red-500' : 'border-gray-200'}`}>
                   <SelectValue placeholder="Pilih Pelatihan yang Dibutuhkan" />
                 </SelectTrigger>
                 <SelectContent>
@@ -166,8 +164,8 @@ export default function AspirasiTaniView() {
                   <SelectItem value="teknologi">Penggunaan Teknologi</SelectItem>
                 </SelectContent>
               </Select>
-              {errors.pelatihanDibutuhkan && (
-                <p className="text-red-500 text-sm mt-1">{errors.pelatihanDibutuhkan}</p>
+              {getFieldError('training_needed') && (
+                <p className="text-red-500 text-sm mt-1">{getErrorMessage('training_needed')}</p>
               )}
             </div>
 
@@ -177,13 +175,13 @@ export default function AspirasiTaniView() {
                 Kebutuhan Mendesak*
               </Label>
               <Select
-                value={formData.kebutuhanMendesak}
+                value={urgent_needs || ''}
                 onValueChange={(value) => {
-                  setFormData({ ...formData, kebutuhanMendesak: value });
-                  clearError('kebutuhanMendesak');
+                  setValue('urgent_needs', value);
+                  trigger('urgent_needs');
                 }}
               >
-                <SelectTrigger className={`w-full h-12 rounded-xl ${errors.kebutuhanMendesak ? 'border-red-500' : 'border-gray-200'}`}>
+                <SelectTrigger className={`w-full h-12 rounded-xl ${getFieldError('urgent_needs') ? 'border-red-500' : 'border-gray-200'}`}>
                   <SelectValue placeholder="Pilih Kebutuhan Mendesak" />
                 </SelectTrigger>
                 <SelectContent>
@@ -195,8 +193,8 @@ export default function AspirasiTaniView() {
                   <SelectItem value="irigasi">Perbaikan Irigasi</SelectItem>
                 </SelectContent>
               </Select>
-              {errors.kebutuhanMendesak && (
-                <p className="text-red-500 text-sm mt-1">{errors.kebutuhanMendesak}</p>
+              {getFieldError('urgent_needs') && (
+                <p className="text-red-500 text-sm mt-1">{getErrorMessage('urgent_needs')}</p>
               )}
             </div>
 
@@ -206,13 +204,13 @@ export default function AspirasiTaniView() {
                 Akses Air Pertanian (P2T)*
               </Label>
               <Select
-                value={formData.aksesAir}
+                value={water_access || ''}
                 onValueChange={(value) => {
-                  setFormData({ ...formData, aksesAir: value });
-                  clearError('aksesAir');
+                  setValue('water_access', value);
+                  trigger('water_access');
                 }}
               >
-                <SelectTrigger className={`w-full h-12 rounded-xl ${errors.aksesAir ? 'border-red-500' : 'border-gray-200'}`}>
+                <SelectTrigger className={`w-full h-12 rounded-xl ${getFieldError('water_access') ? 'border-red-500' : 'border-gray-200'}`}>
                   <SelectValue placeholder="Pilih Akses Air Pertanian" />
                 </SelectTrigger>
                 <SelectContent>
@@ -222,8 +220,8 @@ export default function AspirasiTaniView() {
                   <SelectItem value="tidak-ada">Tidak Ada Akses</SelectItem>
                 </SelectContent>
               </Select>
-              {errors.aksesAir && (
-                <p className="text-red-500 text-sm mt-1">{errors.aksesAir}</p>
+              {getFieldError('water_access') && (
+                <p className="text-red-500 text-sm mt-1">{getErrorMessage('water_access')}</p>
               )}
             </div>
           </div>
@@ -240,29 +238,29 @@ export default function AspirasiTaniView() {
               Apa harapan dan saran Bapak/Ibu ke depan agar pertanian lebih baik?*
             </Label>
             <Textarea
-              value={formData.harapanMasaDepan}
+              value={suggestions || ''}
               onChange={(e: any) => {
-                setFormData({ ...formData, harapanMasaDepan: e.target.value });
-                clearError('harapanMasaDepan');
+                setValue('suggestions', e.target.value);
+                trigger('suggestions');
               }}
               placeholder="Tulis harapan dan saran di sini"
-              className={`min-h-[150px] rounded-xl ${errors.harapanMasaDepan ? 'border-red-500' : 'border-gray-200'} resize-none focus:ring-2 focus:ring-green-500`}
+              className={`min-h-[150px] rounded-xl ${getFieldError('suggestions') ? 'border-red-500' : 'border-gray-200'} resize-none focus:ring-2 focus:ring-green-500`}
             />
-            {errors.harapanMasaDepan && (
-              <p className="text-red-500 text-sm mt-1">{errors.harapanMasaDepan}</p>
+            {getFieldError('suggestions') && (
+              <p className="text-red-500 text-sm mt-1">{getErrorMessage('suggestions')}</p>
             )}
             <div className="flex justify-between items-center mt-1">
               <p className="text-xs text-gray-500">
                 Ceritakan harapan, saran, atau masukan untuk perbaikan pertanian di wilayah Anda
               </p>
-              <p className={`text-xs ${getCharacterCount(formData.harapanMasaDepan ?? '').isValid ? 'text-gray-500' : 'text-red-500'}`}>
-                {getCharacterCount(formData.harapanMasaDepan ?? '').current}/1000
+              <p className={`text-xs ${getCharacterCount(suggestions ?? '').isValid ? 'text-gray-500' : 'text-red-500'}`}>
+                {getCharacterCount(suggestions ?? '').current}/1000
               </p>
             </div>
           </div>
           {/* Consistency warnings */}
           {(() => {
-            const consistencyCheck = checkFieldConsistency(formData.kendalaUtama, formData.aksesAir);
+            const consistencyCheck = checkFieldConsistency(main_constraint || '', water_access || '');
             if (!consistencyCheck.isConsistent && consistencyCheck.warning) {
               return (
                 <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
@@ -284,9 +282,10 @@ export default function AspirasiTaniView() {
             </Button>
             <Button
               onClick={handleSubmit}
-              className="sm:w-auto w-full bg-green-600 cursor-pointer hover:bg-green-700 text-white font-semibold py-6 px-10 rounded-xl transition-all duration-200 shadow-lg flex items-center justify-center gap-2"
+              disabled={isSubmittingForm || isSubmitting}
+              className="sm:w-auto w-full bg-green-600 cursor-pointer hover:bg-green-700 text-white font-semibold py-6 px-10 rounded-xl transition-all duration-200 shadow-lg flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              Kirim
+              {isSubmittingForm || isSubmitting ? 'Mengirim...' : 'Kirim'}
               <Icon icon="material-symbols:send" className="w-5 h-5" />
             </Button>
           </div>
