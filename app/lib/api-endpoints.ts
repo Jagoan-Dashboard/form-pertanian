@@ -1,4 +1,4 @@
 export class ENDPOINTS{
-    static LOGIN = "login";
-    static LOGOUT = "logout";
+    static CREATE_REPORT = "/api/v1/agriculture";
+
 }
