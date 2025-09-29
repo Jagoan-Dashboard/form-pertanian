@@ -57,9 +57,18 @@ export function FormProvider({ children }: { children: React.ReactNode }) {
       await apiClient.post(ENDPOINTS.CREATE_REPORT, formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
-  
-      methods.reset();
-      navigate("/");
+
+      // Reset form with default values to ensure complete reset
+      methods.reset({
+        affected_area: 0,
+        district: "Ngawi",
+      });
+
+      // Force page refresh after form submission
+      setTimeout(() => {
+        navigate("/");
+        window.location.reload();
+      }, 1000);
   
     } catch (error) {
       console.error("Form submission error:", error);
