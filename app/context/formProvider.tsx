@@ -14,7 +14,17 @@ export function FormWrapper({ children }: { children: React.ReactNode }) {
 
   return (
     <RHFProvider {...methods}>
-      <form onSubmit={methods.handleSubmit((data) => console.log("Submit final data:", data))}>
+      <form onSubmit={methods.handleSubmit((data) => {
+        const formData = new FormData();
+        Object.entries(data).forEach(([key, value]) => {
+          if (key === 'photos' && value instanceof File) {
+            formData.append(key, value);
+          } else if (value !== undefined && value !== null) {
+            formData.append(key, String(value));
+          }
+        });
+        console.log("Submit final data:", Object.fromEntries(formData.entries()));
+      })}>
         {children}
       </form>
     </RHFProvider>

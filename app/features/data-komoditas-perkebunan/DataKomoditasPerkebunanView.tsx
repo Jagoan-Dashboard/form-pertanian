@@ -479,29 +479,19 @@ export default function DataKomoditasPerkebunanView() {
             <Label className={`text-sm font-semibold mb-2 ${!adaSeranganHama ? 'text-gray-400' : 'text-gray-700'}`}>
               Luas Terserang Hama*
             </Label>
-            <Select
-              onValueChange={(value) => {
-                const numValue = value === "ringan" ? 25 : value === "sedang" ? 50 : value === "berat" ? 75 : 0;
-                setValue("affected_area", numValue);
-              }}
-              value={luasSeranganHama ? (typeof luasSeranganHama === 'number' && luasSeranganHama <= 25 ? "ringan" : typeof luasSeranganHama === 'number' && luasSeranganHama <= 50 ? "sedang" : "berat") : undefined}
+            <Input
+              type="number"
+              {...register("affected_area", { valueAsNumber: true })}
+              placeholder="Contoh: 10"
               disabled={!adaSeranganHama}
-            >
-              <SelectTrigger className={`w-full h-12 rounded-xl ${
+              className={`h-12 rounded-xl ${
                 !adaSeranganHama
                   ? 'bg-gray-100 text-gray-400 cursor-not-allowed border-gray-200'
                   : getFieldError('affected_area')
                     ? 'border-red-500 focus:ring-red-500'
                     : 'border-gray-200 focus:ring-green-500'
-              }`}>
-                <SelectValue placeholder="Pilih Tingkat Luas Terserang" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="ringan">Ringan (0-25%)</SelectItem>
-                <SelectItem value="sedang">Sedang (26-50%)</SelectItem>
-                <SelectItem value="berat">Berat (&gt;50%)</SelectItem>
-              </SelectContent>
-            </Select>
+                }`}
+            />
             {getFieldError('affected_area') && adaSeranganHama && (
               <p className="text-red-500 text-sm mt-1">{getErrorMessage('affected_area')}</p>
             )}
