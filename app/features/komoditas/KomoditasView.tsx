@@ -1,7 +1,7 @@
-import { useState } from "react";
 import { Button } from "~/components/ui/button";
 import { Icon } from "@iconify/react";
 import { useNavigate } from "react-router";
+import { useFormContext } from "react-hook-form";
 
 interface KomoditasType {
   id: string;
@@ -11,40 +11,37 @@ interface KomoditasType {
 }
 
 export default function KomoditasView() {
-  const [selectedKomoditas, setSelectedKomoditas] = useState<string | null>(null);
   const navigate = useNavigate();
+  const { setValue, watch, formState: { errors } } = useFormContext();
 
+  const selectedKomoditas = watch("selectedKomoditas"); // ambil dari form
   const komoditasList: KomoditasType[] = [
-    {
-      id: "pangan",
-      name: "Pangan",
-      icon: "streamline-plump:wheat-solid",
-      navigate: "/komoditas/pangan"
-    },
-    {
-      id: "hortikultura",
-      name: "Hortikultura",
-      icon: "ri:plant-fill",
-      navigate: "/komoditas/hortikultura"
-    },
-    {
-      id: "perkebunan",
-      name: "Perkebunan",
-      icon: "mdi:seed",
-      navigate: "/komoditas/perkebunan"
-    }
+    { id: "pangan", name: "Pangan", icon: "streamline-plump:wheat-solid", navigate: "/data-komoditas-pangan" },
+    { id: "hortikultura", name: "Hortikultura", icon: "ri:plant-fill", navigate: "/data-komoditas-hortikultura" },
+    { id: "perkebunan", name: "Perkebunan", icon: "mdi:seed", navigate: "/data-komoditas-perkebunan" }
   ];
 
-  const handleSelect = (id: string) => {
-    setSelectedKomoditas(id);
+  const handleSelect = (id: "pangan" | "hortikultura" | "perkebunan") => {
+    setValue("selectedKomoditas", id, { shouldValidate: true });
+
+    // Reset other komoditas data
+    if (id === "pangan") {
+      setValue("horti_commodity", undefined);
+      setValue("plantation_commodity", undefined);
+    } else if (id === "hortikultura") {
+      setValue("food_commodity", undefined);
+      setValue("plantation_commodity", undefined);
+    } else if (id === "perkebunan") {
+      setValue("food_commodity", undefined);
+      setValue("horti_commodity", undefined);
+    }
   };
 
   const handleNext = () => {
     const selected = komoditasList.find(k => k.id === selectedKomoditas);
     if (selected) {
-      console.log('Navigating to:', selected.navigate);
-      // Store the selected komoditas type, not the full path
-      localStorage.setItem("komoditas", selected.id);
+      console.log("Navigating to:", selected.navigate);
+      localStorage.setItem("komoditas", selected.id); // opsional
       navigate(selected.navigate);
     }
   };
@@ -64,21 +61,30 @@ export default function KomoditasView() {
             <button
               key={komoditas.id}
               onClick={() => handleSelect(komoditas.id)}
-              className={`p-6 rounded-2xl border-2 transition-all duration-200 ${isSelected
+              type="button"
+              className={`p-6 rounded-2xl border-2 transition-all duration-200 ${
+                isSelected
                   ? "border-green-600 bg-green-50"
                   : "border-gray-200 bg-white hover:border-green-300 hover:bg-gray-50"
-                }`}
+              }`}
             >
-              <div className={`w-16 h-16 rounded-2xl mx-auto mb-4 flex items-center justify-center ${isSelected ? "bg-green-600" : "bg-green-100"
-                }`}>
+              <div
+                className={`w-16 h-16 rounded-2xl mx-auto mb-4 flex items-center justify-center ${
+                  isSelected ? "bg-green-600" : "bg-green-100"
+                }`}
+              >
                 <Icon
                   icon={komoditas.icon}
-                  className={`w-8 h-8 ${isSelected ? "text-white" : "text-green-600"
-                    }`}
+                  className={`w-8 h-8 ${
+                    isSelected ? "text-white" : "text-green-600"
+                  }`}
                 />
               </div>
-              <p className={`text-center font-semibold ${isSelected ? "text-green-600" : "text-gray-700"
-                }`}>
+              <p
+                className={`text-center font-semibold ${
+                  isSelected ? "text-green-600" : "text-gray-700"
+                }`}
+              >
                 {komoditas.name}
               </p>
             </button>
@@ -86,18 +92,27 @@ export default function KomoditasView() {
         })}
       </div>
 
+      {/* Error handling */}
+      {errors.selectedKomoditas && (
+        <p className="text-red-500 text-sm mb-4">
+          {errors.selectedKomoditas.message?.toString()}
+        </p>
+      )}
+
       {/* Action Buttons */}
       <div className="flex justify-end gap-3">
         <Button
           variant="outline"
           onClick={() => navigate("/")}
-          className="px-8 py-6 rounded-xl cursor-pointer  border-green-600 text-green-600 hover:bg-green-50 hover:text-green-600"
+          type="button"
+          className="px-8 py-6 rounded-xl cursor-pointer border-green-600 text-green-600 hover:bg-green-50 hover:text-green-600"
         >
           Kembali
         </Button>
         <Button
           onClick={handleNext}
           disabled={!selectedKomoditas}
+          type="button"
           className="bg-green-600 cursor-pointer hover:bg-green-700 text-white font-semibold py-6 px-10 rounded-xl transition-all duration-200 shadow-lg flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
         >
           Selanjutnya

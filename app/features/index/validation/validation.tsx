@@ -13,7 +13,7 @@ export const indexViewSchema = z.object({
       },
       "Latitude harus berupa angka antara -90 dan 90"
     ),
-  
+
   longitude: z
     .string()
     .min(1, "Longitude wajib diisi")
@@ -30,32 +30,35 @@ export const indexViewSchema = z.object({
     .string()
     .min(1, "Nama Penyuluh wajib diisi")
     .max(100, "Nama Penyuluh tidak boleh lebih dari 100 karakter")
-    .regex(/^[a-zA-Z\s\u00C0-\u017F\u0100-\u017F\u1E00-\u1EFF]*$/, 
+    .regex(/^[a-zA-Z\s\u00C0-\u017F\u0100-\u017F\u1E00-\u1EFF]*$/,
       "Nama Penyuluh hanya boleh berisi huruf dan spasi"
     ),
 
   tanggalKunjungan: z
-    .date({ 
-      message: "Tanggal Kunjungan wajib dipilih dan harus berupa tanggal yang valid"
-    })
+    .string()
+    .min(1, "Tanggal Kunjungan wajib dipilih")
     .refine(
-      (date) => date <= new Date(),
+      (val) => {
+        const date = new Date(val);
+        return !isNaN(date.getTime()) && date <= new Date();
+      },
       "Tanggal Kunjungan tidak boleh di masa depan"
     ),
+
+
 
   namaPetani: z
     .string()
     .min(1, "Nama Petani wajib diisi")
     .max(100, "Nama Petani tidak boleh lebih dari 100 karakter")
-    .regex(/^[a-zA-Z\s\u00C0-\u017F\u0100-\u017F\u1E00-\u1EFF]*$/,
-      "Nama Petani hanya boleh berisi huruf dan spasi"
-    ),
+    .regex(/^[\p{L}\s'.-]+$/u, "Nama hanya boleh huruf, spasi, titik, apostrof, dan tanda hubung")
+  ,
 
   namaKelompokTani: z
     .string()
     .min(1, "Nama Kelompok Tani wajib diisi")
     .max(100, "Nama Kelompok Tani tidak boleh lebih dari 100 karakter")
-    .regex(/^[a-zA-Z0-9\s\u00C0-\u017F\u0100-\u017F\u1E00-\u1EFF\-\.]*$/,
+    .regex(/^[\p{L}\s'.-]+$/u,
       "Nama Kelompok Tani hanya boleh berisi huruf, angka, spasi, tanda hubung, dan titik"
     ),
 

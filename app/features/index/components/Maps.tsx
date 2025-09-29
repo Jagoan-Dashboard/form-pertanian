@@ -3,20 +3,27 @@ import { MapContainer, useMapEvents } from 'react-leaflet'
 import { TileLayer } from 'react-leaflet'
 import { useMap } from 'react-leaflet'
 import { Marker } from 'react-leaflet'
+import { useFormContext } from 'react-hook-form'
+import type { FullFormType } from '~/global-validation/validation-step-schemas'
 
 
 // Component untuk handle click pada map
 function LocationMarker({ 
-  position, 
-  setPosition 
+  position
 }: { 
-  position: [number, number] | null; 
-  setPosition: (pos: [number, number]) => void;
+  position: [number, number] | null;
 }) {
+  const { setValue } = useFormContext<FullFormType>();
   const map = useMapEvents({
     click(e) {
-      const newPos: [number, number] = [e.latlng.lat, e.latlng.lng];
-      setPosition(newPos);
+      const newLat = e.latlng.lat.toString();
+      const newLng = e.latlng.lng.toString();
+      
+      // Update form values
+      setValue('latitude', newLat, { shouldValidate: true });
+      setValue('longitude', newLng, { shouldValidate: true });
+      
+      // Update position in parent state
       map.flyTo(e.latlng, map.getZoom());
     },
   });
@@ -50,6 +57,16 @@ export default function Maps({
   height = "h-64",
   zoom = 13 
 }: MapsProps) {
+  const { setValue } = useFormContext<FullFormType>();
+  
+  // Update form values when position changes
+  useEffect(() => {
+    if (position) {
+      setValue('latitude', position[0].toString(), { shouldValidate: true });
+      setValue('longitude', position[1].toString(), { shouldValidate: true });
+    }
+  }, [position, setValue]);
+
   return (
     <div className={`rounded-2xl overflow-hidden shadow-lg border border-gray-200 ${height} relative`}>
       <MapContainer
@@ -62,7 +79,7 @@ export default function Maps({
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
-        <LocationMarker position={position} setPosition={setPosition} />
+        <LocationMarker position={position} />
         <FlyToLocation position={position} />
       </MapContainer>
     </div>

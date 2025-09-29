@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { z } from "zod";
 import Maps from "./components/Maps";
 import { Icon } from "@iconify/react";
 import Banner from "./components/Banner";
@@ -10,16 +9,132 @@ import { Popover, PopoverContent, PopoverTrigger } from "~/components/ui/popover
 import { cn } from "~/lib/utils";
 import { id as idLocale } from "date-fns/locale/id";
 import { Calendar } from "~/components/ui/calendar";
-import { FormWrapper } from "~/context/formProvider";
 import { useFormContext } from "react-hook-form";
+import { format } from "date-fns";
 import type { FullFormType } from "~/global-validation/validation-step-schemas";
+import { useNavigate } from "react-router";
 
 export function IndexView() {
-  const { register, formState: { errors } } = useFormContext<FullFormType>();
-  console.log(errors);
+  const { register, formState: { errors }, setValue, getValues, watch, trigger } = useFormContext<FullFormType>();
+  const navigate = useNavigate();
 
+  // Watch field values to use them in the UI
+  const latitude = watch('latitude', '');
+  const longitude = watch('longitude', '');
+  const tanggalKunjungan = watch('tanggalKunjungan');
+  const desaKecamatan = watch('desaKecamatan', '');
+
+  // Handle date selection
+  const handleDateChange = (date: Date | undefined) => {
+    if (date) {
+      setValue('tanggalKunjungan', date.toISOString(), { shouldValidate: true });
+    }
+  };
+
+  // Handle location activation using GPS
+  const aktivasiLokasi = () => {
+    if (!navigator.geolocation) {
+      alert('Geolokasi tidak didukung oleh browser ini');
+      return;
+    }
+
+    setIsLoadingLocation(true);
+
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const lat = position.coords.latitude;
+        const lng = position.coords.longitude;
+
+        // Update form values
+        setValue('latitude', lat.toString(), { shouldValidate: true });
+        setValue('longitude', lng.toString(), { shouldValidate: true });
+
+        // Update map position
+        setPosition([lat, lng]);
+
+        setIsLoadingLocation(false);
+        console.log(`Lokasi ditemukan: ${lat}, ${lng}`);
+      },
+      (error) => {
+        setIsLoadingLocation(false);
+        let errorMessage = 'Tidak dapat mengambil lokasi';
+
+        switch (error.code) {
+          case error.PERMISSION_DENIED:
+            errorMessage = 'Akses lokasi ditolak. Silakan izinkan akses lokasi di browser Anda.';
+            break;
+          case error.POSITION_UNAVAILABLE:
+            errorMessage = 'Informasi lokasi tidak tersedia.';
+            break;
+          case error.TIMEOUT:
+            errorMessage = 'Permintaan lokasi timeout.';
+            break;
+        }
+
+        alert(errorMessage);
+        console.error('Error getting location:', error);
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 10000,
+        maximumAge: 300000 // 5 minutes
+      }
+    );
+  };
+
+  const [isLoadingLocation, setIsLoadingLocation] = useState(false);
+
+  // Format date for display (in Indonesian format)
+  const formatIndonesianLong = (date: Date) => {
+    return format(date, 'dd MMMM yyyy', { locale: idLocale });
+  };
+  // Position state for maps - derive from form values
+  const [position, setPosition] = useState<[number, number]>([-7.4034, 111.4464]);
+
+  // Update position when latitude/longitude values change in the form
+  useEffect(() => {
+    const lat = parseFloat(latitude);
+    const lng = parseFloat(longitude);
+
+    if (!isNaN(lat) && !isNaN(lng)) {
+      setPosition([lat, lng]);
+    }
+  }, [latitude, longitude]);
+
+
+
+  // 1. Debug realtime perubahan field tertentu
+  useEffect(() => {
+    const subscription = watch((value, { name, type }) => {
+      console.log("📌 Field berubah:", name, "Type:", type, "Value:", value);
+    });
+    return () => subscription.unsubscribe();
+  }, [watch]);
+
+  // 2. Debug semua data saat tombol Next ditekan
+  const handleNext = async () => {
+    const isValid = await trigger([
+      "latitude",
+      "longitude",
+      "namaPenyuluh",
+      "tanggalKunjungan",
+      "namaPetani",
+      "namaKelompokTani",
+      "desaKecamatan",
+    ]);
+
+    console.log("📝 Data sekarang:", getValues()); // log semua field
+
+    if (isValid) {
+      console.log("✅ Data valid:", getValues());
+      navigate("/komoditas");
+    } else {
+      console.log("❌ Data tidak valid:", getValues());
+    }
+  };
   return (
     <main className="space-y-6">
+
       <div className="hidden sm:block">
         <Banner />
       </div>
@@ -54,16 +169,15 @@ export function IndexView() {
               </label>
               <Input
                 type="text"
-                value={latitude}
-                onChange={(e) => handleLatitudeChange(e.target.value)}
-                className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all ${errors.latitude
-                  ? 'border-red-500 focus:ring-red-500'
-                  : 'border-gray-200 focus:ring-green-500'
-                  }`}
                 placeholder="-7.4034"
+                className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all ${errors.latitude
+                  ? "border-red-500 focus:ring-red-500"
+                  : "border-gray-200 focus:ring-green-500"
+                  }`}
+                {...register("latitude")}
               />
               {errors.latitude && (
-                <p className="text-red-500 text-sm mt-1">{errors.latitude}</p>
+                <p className="text-red-500 text-sm mt-1">{errors.latitude?.message?.toString()}</p>
               )}
             </div>
 
@@ -73,16 +187,15 @@ export function IndexView() {
               </label>
               <Input
                 type="text"
-                value={longitude}
-                onChange={(e) => handleLongitudeChange(e.target.value)}
-                className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all ${errors.longitude
-                  ? 'border-red-500 focus:ring-red-500'
-                  : 'border-gray-200 focus:ring-green-500'
-                  }`}
                 placeholder="111.4464"
+                className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all ${errors.longitude
+                  ? "border-red-500 focus:ring-red-500"
+                  : "border-gray-200 focus:ring-green-500"
+                  }`}
+                {...register('longitude')}
               />
               {errors.longitude && (
-                <p className="text-red-500 text-sm mt-1">{errors.longitude}</p>
+                <p className="text-red-500 text-sm mt-1">{errors.longitude?.message?.toString()}</p>
               )}
             </div>
 
@@ -124,16 +237,15 @@ export function IndexView() {
             </label>
             <Input
               type="text"
-              value={namaPenyuluh}
-              onChange={(e) => setNamaPenyuluh(e.target.value)}
               placeholder="Contoh: Penyuluh 012"
               className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all ${errors.namaPenyuluh
-                ? 'border-red-500 focus:ring-red-500'
-                : 'border-gray-200 focus:ring-green-500'
+                ? "border-red-500 focus:ring-red-500"
+                : "border-gray-200 focus:ring-green-500"
                 }`}
+              {...register('namaPenyuluh')}
             />
             {errors.namaPenyuluh && (
-              <p className="text-red-500 text-sm mt-1">{errors.namaPenyuluh}</p>
+              <p className="text-red-500 text-sm mt-1">{errors.namaPenyuluh?.message?.toString()}</p>
             )}
           </div>
 
@@ -153,9 +265,9 @@ export function IndexView() {
                   )}
                 >
                   <Icon icon="material-symbols:calendar" className="mr-2 h-5 w-5 text-gray-400" />
-                  {date ? (
+                  {tanggalKunjungan ? (
                     <span className="text-gray-900">
-                      {formatIndonesianLong(date)}
+                      {formatIndonesianLong(new Date(tanggalKunjungan))}
                     </span>
                   ) : (
                     <span className={`${errors.tanggalKunjungan ? 'text-red-500' : 'text-gray-400'}`}>Pilih tanggal kunjungan</span>
@@ -165,16 +277,15 @@ export function IndexView() {
               <PopoverContent className="w-auto p-0 rounded-2xl border-gray-200" align="start">
                 <Calendar
                   mode="single"
-                  selected={date}
-                  onSelect={setDate}
-
+                  selected={tanggalKunjungan ? new Date(tanggalKunjungan) : undefined}
+                  onSelect={handleDateChange}
                   locale={idLocale}
                   className="rounded-2xl"
                 />
               </PopoverContent>
             </Popover>
             {errors.tanggalKunjungan && (
-              <p className="text-red-500 text-sm mt-1">{errors.tanggalKunjungan}</p>
+              <p className="text-red-500 text-sm mt-1">{errors.tanggalKunjungan?.message?.toString()}</p>
             )}
           </div>
 
@@ -184,17 +295,19 @@ export function IndexView() {
             </label>
             <Input
               type="text"
-              value={namaPetani}
-              onChange={(e) => setNamaPetani(e.target.value)}
               placeholder="Contoh: Samsudin"
               className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all ${errors.namaPetani
-                ? 'border-red-500 focus:ring-red-500'
-                : 'border-gray-200 focus:ring-green-500'
+                ? "border-red-500 focus:ring-red-500"
+                : "border-gray-200 focus:ring-green-500"
                 }`}
+              {...register("namaPetani")}
             />
             {errors.namaPetani && (
-              <p className="text-red-500 text-sm mt-1">{errors.namaPetani}</p>
+              <p className="text-red-500 text-sm mt-1">
+                {errors.namaPetani?.message?.toString()}
+              </p>
             )}
+
           </div>
 
           <div>
@@ -203,16 +316,15 @@ export function IndexView() {
             </label>
             <Input
               type="text"
-              value={namaKelompokTani}
-              onChange={(e) => setNamaKelompokTani(e.target.value)}
               placeholder="Contoh: Poktan Kampung Bukit"
               className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all ${errors.namaKelompokTani
-                ? 'border-red-500 focus:ring-red-500'
-                : 'border-gray-200 focus:ring-green-500'
+                ? "border-red-500 focus:ring-red-500"
+                : "border-gray-200 focus:ring-green-500"
                 }`}
+              {...register('namaKelompokTani')}
             />
             {errors.namaKelompokTani && (
-              <p className="text-red-500 text-sm mt-1">{errors.namaKelompokTani}</p>
+              <p className="text-red-500 text-sm mt-1">{errors.namaKelompokTani?.message?.toString()}</p>
             )}
           </div>
 
@@ -220,7 +332,7 @@ export function IndexView() {
             <label className="block text-sm font-semibold text-gray-700 mb-2">
               Desa/Kecamatan*
             </label>
-            <Select value={desaKecamatan} onValueChange={setDesaKecamatan}>
+            <Select value={desaKecamatan} onValueChange={(value) => setValue('desaKecamatan', value, { shouldValidate: true })}>
               <SelectTrigger className={`w-full px-4 py-3 rounded-xl focus:ring-2 focus:border-transparent transition-all appearance-none bg-white ${errors.desaKecamatan
                 ? 'border-red-500 focus:ring-red-500'
                 : 'border-gray-200 focus:ring-green-500'
@@ -233,13 +345,17 @@ export function IndexView() {
               </SelectContent>
             </Select>
             {errors.desaKecamatan && (
-              <p className="text-red-500 text-sm mt-1">{errors.desaKecamatan}</p>
+              <p className="text-red-500 text-sm mt-1">{errors.desaKecamatan?.message?.toString()}</p>
             )}
           </div>
         </div>
 
         <div className="mt-8 flex w-full justify-end ">
-          <Button onClick={handleSubmit} className="bg-green-600 sm:w-fit cursor-pointer w-full hover:bg-green-700 text-white font-semibold py-6 px-10 rounded-xl transition-all duration-200 shadow-lg flex items-center gap-2">
+          <Button
+            type="button" // ⚡ penting: jangan submit default
+            onClick={handleNext}
+            className="bg-green-600 sm:w-fit cursor-pointer w-full hover:bg-green-700 text-white font-semibold py-6 px-10 rounded-xl transition-all duration-200 shadow-lg flex items-center gap-2"
+          >
             Selanjutnya
             <Icon icon="material-symbols:chevron-right" className="w-5 h-5" />
           </Button>

@@ -2,6 +2,9 @@ import { z } from "zod";
 
 // Validation schema for Data Komoditas Pangan form
 export const dataKomoditasPanganSchema = z.object({
+  // Discriminator for union
+  komoditas: z.literal("pangan"),
+
   // Data Komoditas Section
   komoditasPangan: z
     .string()

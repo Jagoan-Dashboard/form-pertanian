@@ -33,7 +33,7 @@ export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
   return (
     <main className="container flex items-center justify-center w-screen h-screen mx-auto text-center ">
       <div className="">
-        <h1>{message} awdadadwad</h1>
+        <h1>{message}</h1>
         <p>{details}</p>
         {stack && (
           <pre className="w-full p-4 overflow-x-auto">
