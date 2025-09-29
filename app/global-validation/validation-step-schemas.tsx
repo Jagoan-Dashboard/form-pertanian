@@ -21,9 +21,6 @@ export const stepDataKomoditas = z.discriminatedUnion("komoditas", [
 const stepAspirasiPetani = aspirasiTaniSchema;
 
 // Gabungkan semuanya jadi satu schema
-export const fullSchema = z.intersection(
-  z.intersection(indexViewSchema, stepDataKomoditas),
-  stepAspirasiPetani
-);
+export const fullSchema = indexViewSchema.and(stepDataKomoditas).and(stepAspirasiPetani);
 
 export type FullFormType = z.infer<typeof fullSchema>;

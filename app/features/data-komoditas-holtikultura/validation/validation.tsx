@@ -6,19 +6,19 @@ export const dataKomoditasHortikulturaSchema = z.object({
   komoditas: z.literal("hortikultura"),
 
   // Data Komoditas Section
-  jenisHortikultura: z
+  horti_commodity: z
     .string()
     .min(1, "Jenis Hortikultura yang Ditanam wajib dipilih"),
 
-  komoditasHortikultura: z
+  horti_sub_commodity: z
     .string()
     .min(1, "Komoditas Hortikultura yang Ditanam wajib dipilih"),
 
-  statusLahan: z
+  horti_land_status: z
     .string()
     .min(1, "Status Lahan wajib dipilih"),
 
-  luasLahan: z
+  horti_land_area: z
     .string()
     .min(1, "Luas Lahan wajib diisi")
     .refine(
@@ -29,11 +29,11 @@ export const dataKomoditasHortikulturaSchema = z.object({
       "Luas Lahan harus berupa angka positif"
     ),
 
-  fasePertumbuhan: z
+  horti_growth_phase: z
     .string()
     .min(1, "Fase Pertumbuhan wajib dipilih"),
 
-  umurTanaman: z
+  horti_plant_age: z
     .string()
     .min(1, "Umur Tanaman wajib diisi")
     .refine(
@@ -44,7 +44,7 @@ export const dataKomoditasHortikulturaSchema = z.object({
       "Umur Tanaman harus berupa angka positif"
     ),
 
-  tanggalTanam: z
+  horti_planting_date: z
     .date({
       message: "Tanggal Tanam wajib dipilih dan harus berupa tanggal yang valid"
     })
@@ -53,24 +53,24 @@ export const dataKomoditasHortikulturaSchema = z.object({
       "Tanggal Tanam tidak boleh di masa depan"
     ),
 
-  tanggalPerkiraanPanen: z
+  horti_harvest_date: z
     .date({
       message: "Tanggal Perkiraan Panen wajib dipilih dan harus berupa tanggal yang valid"
     }),
 
-  keteranganTanamPanen: z
+  post_harvest_problems: z
     .string()
     .min(1, "Keterangan Tanam/Panen wajib dipilih"),
 
-  teknologiMetode: z
+  horti_technology: z
     .string()
     .min(1, "Teknologi/Metode wajib dipilih"),
 
-  masalahPascapanen: z
+  horti_delay_reason: z
     .string()
     .min(1, "Masalah Pascapanen wajib dipilih"),
 
-  fotoLokasi: z
+  photos: z
     .any()
     .refine(
       (file) => file instanceof File || file === null || file === undefined,
@@ -92,59 +92,59 @@ export const dataKomoditasHortikulturaSchema = z.object({
     ),
 
   // Laporan Hama, Penyakit, dan Keadaan Cuaca Section
-  adaSeranganHama: z
+  has_pest_disease: z
     .string()
     .min(1, "Ada Serangan Hama/Penyakit wajib dipilih"),
 
-  jenisHamaPenyakit: z
+  pest_disease_type: z
     .string()
     .min(1, "Jenis Hama/Penyakit Dominan wajib dipilih"),
 
-  luasSeranganHama: z
+  affected_area: z
     .string()
     .min(1, "Luas Terserang Hama wajib dipilih"),
 
-  tindakanPengendalianHama: z
+  pest_control_action: z
     .string()
     .min(1, "Tindakan Pengendalian Hama wajib dipilih"),
 
-  cuaca7Hari: z
+  weather_condition: z
     .string()
     .min(1, "Cuaca 7 Hari Terakhir wajib dipilih"),
 
-  dampakCuaca: z
+  weather_impact: z
     .string()
     .min(1, "Dampak Cuaca wajib dipilih"),
 }).refine(
   (data) => {
     // Custom validation: Tanggal panen harus setelah tanggal tanam
-    if (data.tanggalTanam && data.tanggalPerkiraanPanen) {
-      return data.tanggalPerkiraanPanen > data.tanggalTanam;
+    if (data.horti_planting_date && data.horti_harvest_date) {
+      return data.horti_harvest_date > data.horti_planting_date;
     }
     return true;
   },
   {
     message: "Tanggal Perkiraan Panen harus setelah Tanggal Tanam",
-    path: ["tanggalPerkiraanPanen"],
+    path: ["horti_harvest_date"],
   }
 ).refine(
   (data) => {
     // Conditional validation: Jika ada serangan hama, harus pilih jenis dan tindakan
-    if (data.adaSeranganHama === "ya") {
-      return data.jenisHamaPenyakit && data.luasSeranganHama && data.tindakanPengendalianHama;
+    if (data.has_pest_disease === "ya") {
+      return data.pest_disease_type && data.affected_area && data.pest_control_action;
     }
     return true;
   },
   {
     message: "Jika ada serangan hama, semua field terkait hama wajib diisi",
-    path: ["jenisHamaPenyakit"],
+    path: ["pest_disease_type"],
   }
 ).refine(
   (data) => {
     // Validation: Umur tanaman harus sesuai dengan rentang tanggal tanam
-    if (data.tanggalTanam && data.umurTanaman) {
-      const umurHari = parseInt(data.umurTanaman);
-      const tanggalTanam = new Date(data.tanggalTanam);
+    if (data.horti_planting_date && data.horti_plant_age) {
+      const umurHari = parseInt(data.horti_plant_age);
+      const tanggalTanam = new Date(data.horti_planting_date);
       const today = new Date();
       const selisihHari = Math.floor((today.getTime() - tanggalTanam.getTime()) / (1000 * 60 * 60 * 24));
       
@@ -155,7 +155,7 @@ export const dataKomoditasHortikulturaSchema = z.object({
   },
   {
     message: "Umur tanaman tidak sesuai dengan tanggal tanam. Periksa kembali data yang dimasukkan",
-    path: ["umurTanaman"],
+    path: ["horti_plant_age"],
   }
 ).refine(
   (data) => {
@@ -166,9 +166,9 @@ export const dataKomoditasHortikulturaSchema = z.object({
       "tanaman-hias": ["mawar", "anggrek", "melati", "kamboja", "bougenville"]
     };
     
-    if (data.jenisHortikultura && data.komoditasHortikultura) {
-      const validKomoditas = validCombinations[data.jenisHortikultura as keyof typeof validCombinations];
-      if (validKomoditas && !validKomoditas.includes(data.komoditasHortikultura)) {
+    if (data.horti_commodity && data.horti_sub_commodity) {
+      const validKomoditas = validCombinations[data.horti_commodity as keyof typeof validCombinations];
+      if (validKomoditas && !validKomoditas.includes(data.horti_sub_commodity)) {
         return false;
       }
     }
@@ -176,7 +176,7 @@ export const dataKomoditasHortikulturaSchema = z.object({
   },
   {
     message: "Komoditas yang dipilih tidak sesuai dengan jenis hortikultura",
-    path: ["komoditasHortikultura"],
+    path: ["horti_sub_commodity"],
   }
 );
 
@@ -184,29 +184,29 @@ export type DataKomoditasHortikulturaFormData = z.infer<typeof dataKomoditasHort
 
 // Optional: Individual field validations for real-time validation
 export const fieldValidations = {
-  jenisHortikultura: z.string().min(1, "Jenis Hortikultura yang Ditanam wajib dipilih"),
-  komoditasHortikultura: z.string().min(1, "Komoditas Hortikultura yang Ditanam wajib dipilih"),
-  statusLahan: z.string().min(1, "Status Lahan wajib dipilih"),
-  luasLahan: z.string().min(1, "Luas Lahan wajib diisi").refine(
+  horti_commodity: z.string().min(1, "Jenis Hortikultura yang Ditanam wajib dipilih"),
+  horti_sub_commodity: z.string().min(1, "Komoditas Hortikultura yang Ditanam wajib dipilih"),
+  horti_land_status: z.string().min(1, "Status Lahan wajib dipilih"),
+  horti_land_area: z.string().min(1, "Luas Lahan wajib diisi").refine(
     (val) => !isNaN(parseFloat(val)) && parseFloat(val) > 0,
     "Luas Lahan harus berupa angka positif"
   ),
-  fasePertumbuhan: z.string().min(1, "Fase Pertumbuhan wajib dipilih"),
-  umurTanaman: z.string().min(1, "Umur Tanaman wajib diisi").refine(
+  horti_growth_phase: z.string().min(1, "Fase Pertumbuhan wajib dipilih"),
+  horti_plant_age: z.string().min(1, "Umur Tanaman wajib diisi").refine(
     (val) => !isNaN(parseInt(val)) && parseInt(val) > 0,
     "Umur Tanaman harus berupa angka positif"
   ),
-  tanggalTanam: z.date({ message: "Tanggal Tanam wajib dipilih" }),
-  tanggalPerkiraanPanen: z.date({ message: "Tanggal Perkiraan Panen wajib dipilih" }),
-  keteranganTanamPanen: z.string().min(1, "Keterangan Tanam/Panen wajib dipilih"),
-  teknologiMetode: z.string().min(1, "Teknologi/Metode wajib dipilih"),
-  masalahPascapanen: z.string().min(1, "Masalah Pascapanen wajib dipilih"),
-  adaSeranganHama: z.string().min(1, "Ada Serangan Hama/Penyakit wajib dipilih"),
-  jenisHamaPenyakit: z.string().min(1, "Jenis Hama/Penyakit Dominan wajib dipilih"),
-  luasSeranganHama: z.string().min(1, "Luas Terserang Hama wajib dipilih"),
-  tindakanPengendalianHama: z.string().min(1, "Tindakan Pengendalian Hama wajib dipilih"),
-  cuaca7Hari: z.string().min(1, "Cuaca 7 Hari Terakhir wajib dipilih"),
-  dampakCuaca: z.string().min(1, "Dampak Cuaca wajib dipilih"),
+  horti_planting_date: z.date({ message: "Tanggal Tanam wajib dipilih" }),
+  horti_harvest_date: z.date({ message: "Tanggal Perkiraan Panen wajib dipilih" }),
+  post_harvest_problems: z.string().min(1, "Keterangan Tanam/Panen wajib dipilih"),
+  horti_technology: z.string().min(1, "Teknologi/Metode wajib dipilih"),
+  horti_delay_reason: z.string().min(1, "Masalah Pascapanen wajib dipilih"),
+  has_pest_disease: z.string().min(1, "Ada Serangan Hama/Penyakit wajib dipilih"),
+  pest_disease_type: z.string().min(1, "Jenis Hama/Penyakit Dominan wajib dipilih"),
+  affected_area: z.string().min(1, "Luas Terserang Hama wajib dipilih"),
+  pest_control_action: z.string().min(1, "Tindakan Pengendalian Hama wajib dipilih"),
+  weather_condition: z.string().min(1, "Cuaca 7 Hari Terakhir wajib dipilih"),
+  weather_impact: z.string().min(1, "Dampak Cuaca wajib dipilih"),
 };
 
 // Helper function for conditional validation based on jenis hortikultura

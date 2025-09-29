@@ -1,10 +1,9 @@
-import { useState } from "react";
+import React, { useEffect } from "react";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "~/components/ui/select";
 import { Icon } from "@iconify/react";
-import { useStepStore } from "~/store/stepStore";
 import { Popover, PopoverContent, PopoverTrigger } from "~/components/ui/popover";
 import { cn } from "~/lib/utils";
 import { id as idLocale } from "date-fns/locale/id";
@@ -12,29 +11,43 @@ import { Calendar } from "~/components/ui/calendar";
 import { CalendarIcon } from "lucide-react";
 import { useNavigate } from "react-router";
 import { ImageUpload } from "~/components/ImageUplaod";
-import { dataKomoditasPanganSchema } from "./validation/validation";
-import { z } from "zod";
-
+import { useFormContext } from "react-hook-form";
+import type { FullFormType } from "~/global-validation/validation-step-schemas";
 
 export default function DataKomoditasPanganView() {
-  const [dateTanam, setDateTanam] = useState<Date>();
-  const [datePerkiraanPanen, setDatePerkiraanPanen] = useState<Date>();
+  const { register, formState: { errors }, setValue, getValues, watch, trigger } = useFormContext<FullFormType>();
   const navigate = useNavigate();
-  const [errors, setErrors] = useState<Record<string, string>>({});
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [komoditasPangan, setKomoditasPangan] = useState<string>("");
-  const [statusLahan, setStatusLahan] = useState<string>("");
-  const [luasLahan, setLuasLahan] = useState<string>("");
-  const [fasePertumbuhan, setFasePertumbuhan] = useState<string>("");
-  const [umurTanaman, setUmurTanaman] = useState<string>("");
-  const [teknologiMetode, setTeknologiMetode] = useState<string>("");
-  const [keteranganTanamPanen, setKeteranganTanamPanen] = useState<string>("");
-  const [adaSeranganHama, setAdaSeranganHama] = useState<string>("");
-  const [jenisHamaPenyakit, setJenisHamaPenyakit] = useState<string>("");
-  const [luasSeranganHama, setLuasSeranganHama] = useState<string>("");
-  const [tindakanPengendalianHama, setTindakanPengendalianHama] = useState<string>("");
-  const [cuaca7Hari, setCuaca7Hari] = useState<string>("");
-  const [dampakCuaca, setDampakCuaca] = useState<string>("");
+
+  // Set komoditas value to "pangan" when component mounts
+  React.useEffect(() => {
+    setValue("komoditas", "pangan");
+  }, [setValue]);
+
+  // Type guard for pangan-specific errors
+  const getFieldError = (fieldName: string) => {
+    return errors[fieldName as keyof typeof errors];
+  };
+
+  const getErrorMessage = (fieldName: string): string | undefined => {
+    const error = getFieldError(fieldName);
+    if (error && typeof error === 'object' && 'message' in error) {
+      return typeof error.message === 'string' ? error.message : String(error.message);
+    }
+    return undefined;
+  };
+
+  const dateTanam = watch("food_planting_date");
+  const datePerkiraanPanen = watch("food_harvest_date");
+  const foodCommodity = watch("food_commodity");
+  const foodLandStatus = watch("food_land_status");
+  const foodGrowthPhase = watch("food_growth_phase");
+  const foodTechnology = watch("food_technology");
+  const foodDelayReason = watch("food_delay_reason");
+  const hasPestDisease = watch("has_pest_disease");
+  const pestDiseaseType = watch("pest_disease_type");
+  const pestControlAction = watch("pest_control_action");
+  const weatherCondition = watch("weather_condition");
+  const weatherImpact = watch("weather_impact");
 
   const formatIndonesianLong = (date: Date) => {
     const bulan = [
@@ -44,45 +57,38 @@ export default function DataKomoditasPanganView() {
     return `${date.getDate()} ${bulan[date.getMonth()]} ${date.getFullYear()}`;
   };
 
-  // Fungsi validasi
-  const validateForm = () => {
-    try {
-      dataKomoditasPanganSchema.parse({
-        komoditasPangan,
-        statusLahan,
-        luasLahan,
-        fasePertumbuhan,
-        umurTanaman,
-        teknologiMetode,
-        tanggalTanam: dateTanam,
-        tanggalPerkiraanPanen: datePerkiraanPanen,
-        keteranganTanamPanen,
-        fotoLokasi: selectedFile,
-        adaSeranganHama,
-        jenisHamaPenyakit,
-        luasSeranganHama,
-        tindakanPengendalianHama,
-        cuaca7Hari,
-        dampakCuaca
-      });
+  const handleNext = async () => {
+    const isValid = await trigger([
+      "food_commodity",
+      "food_land_status",
+      "food_land_area",
+      "food_growth_phase",
+      "food_plant_age",
+      "food_technology",
+      "food_planting_date",
+      "food_harvest_date",
+      "food_delay_reason",
+      "has_pest_disease",
+      "pest_disease_type",
+      "affected_area",
+      "pest_control_action",
+      "weather_condition",
+      "weather_impact",
+    ]);
 
-      setErrors({});
-      return true;
-    } catch (error) {
-      if (error instanceof z.ZodError) {
-        const newErrors: Record<string, string> = {};
-        error.issues.forEach((err) => {
-          if (err.path && err.path.length > 0) {
-            const fieldName = err.path[0] as string;
-            newErrors[fieldName] = err.message;
-          }
-        });
-        setErrors(newErrors);
-        return false;
-      }
-      return false;
+    if (isValid) {
+      navigate("/aspirasi-tani");
     }
   };
+
+
+  // 1. Debug realtime perubahan field tertentu
+  useEffect(() => {
+    const subscription = watch((value, { name, type }) => {
+      console.log("📌 Field berubah:", name, "Type:", type, "Value:", value);
+    });
+    return () => subscription.unsubscribe();
+  }, [watch]);
 
   return (
     <div className="space-y-6">
@@ -96,12 +102,11 @@ export default function DataKomoditasPanganView() {
             <Label className="text-sm font-semibold text-gray-700 mb-2">
               Komoditas Pangan yang Ditanam*
             </Label>
-            <Select value={komoditasPangan} onValueChange={setKomoditasPangan}>
-              <SelectTrigger className={`w-full h-12 rounded-xl ${
-                errors.komoditasPangan 
-                  ? 'border-red-500 focus:ring-red-500' 
+            <Select onValueChange={(value) => setValue("food_commodity", value)} value={foodCommodity}>
+              <SelectTrigger className={`w-full h-12 rounded-xl ${getFieldError('food_commodity')
+                  ? 'border-red-500 focus:ring-red-500'
                   : 'border-gray-200 focus:ring-green-500'
-              }`}>
+                }`}>
                 <SelectValue placeholder="Pilih Komoditas Pangan" />
               </SelectTrigger>
               <SelectContent>
@@ -110,8 +115,8 @@ export default function DataKomoditasPanganView() {
                 <SelectItem value="kedelai">Kedelai</SelectItem>
               </SelectContent>
             </Select>
-            {errors.komoditasPangan && (
-              <p className="text-red-500 text-sm mt-1">{errors.komoditasPangan}</p>
+            {getFieldError('food_commodity') && (
+              <p className="text-red-500 text-sm mt-1">{getErrorMessage('food_commodity')}</p>
             )}
           </div>
 
@@ -120,12 +125,11 @@ export default function DataKomoditasPanganView() {
             <Label className="text-sm font-semibold text-gray-700 mb-2">
               Status Lahan*
             </Label>
-            <Select value={statusLahan} onValueChange={setStatusLahan}>
-              <SelectTrigger className={`w-full h-12 rounded-xl ${
-                errors.statusLahan 
-                  ? 'border-red-500 focus:ring-red-500' 
+            <Select onValueChange={(value) => setValue("food_land_status", value)} value={foodLandStatus}>
+              <SelectTrigger className={`w-full h-12 rounded-xl ${getFieldError('food_land_status')
+                  ? 'border-red-500 focus:ring-red-500'
                   : 'border-gray-200 focus:ring-green-500'
-              }`}>
+                }`}>
                 <SelectValue placeholder="Pilih Status Lahan" />
               </SelectTrigger>
               <SelectContent>
@@ -134,8 +138,8 @@ export default function DataKomoditasPanganView() {
                 <SelectItem value="bagi-hasil">Bagi Hasil</SelectItem>
               </SelectContent>
             </Select>
-            {errors.statusLahan && (
-              <p className="text-red-500 text-sm mt-1">{errors.statusLahan}</p>
+            {getFieldError('food_land_status') && (
+              <p className="text-red-500 text-sm mt-1">{getErrorMessage('food_land_status')}</p>
             )}
           </div>
 
@@ -146,17 +150,15 @@ export default function DataKomoditasPanganView() {
             </Label>
             <Input
               type="number"
-              value={luasLahan}
-              onChange={(e) => setLuasLahan(e.target.value)}
+              {...register("food_land_area", { valueAsNumber: true })}
               placeholder="Contoh: 10"
-              className={`h-12 rounded-xl ${
-                errors.luasLahan 
-                  ? 'border-red-500 focus:ring-red-500' 
+              className={`h-12 rounded-xl ${getFieldError('food_land_area')
+                  ? 'border-red-500 focus:ring-red-500'
                   : 'border-gray-200 focus:ring-green-500'
-              }`}
+                }`}
             />
-            {errors.luasLahan && (
-              <p className="text-red-500 text-sm mt-1">{errors.luasLahan}</p>
+            {getFieldError('food_land_area') && (
+              <p className="text-red-500 text-sm mt-1">{getErrorMessage('food_land_area')}</p>
             )}
           </div>
 
@@ -165,12 +167,11 @@ export default function DataKomoditasPanganView() {
             <Label className="text-sm font-semibold text-gray-700 mb-2">
               Fase Pertumbuhan*
             </Label>
-            <Select value={fasePertumbuhan} onValueChange={setFasePertumbuhan}>
-              <SelectTrigger className={`w-full h-12 rounded-xl ${
-                errors.fasePertumbuhan 
-                  ? 'border-red-500 focus:ring-red-500' 
+            <Select onValueChange={(value) => setValue("food_growth_phase", value)} value={foodGrowthPhase}>
+              <SelectTrigger className={`w-full h-12 rounded-xl ${getFieldError('food_growth_phase')
+                  ? 'border-red-500 focus:ring-red-500'
                   : 'border-gray-200 focus:ring-green-500'
-              }`}>
+                }`}>
                 <SelectValue placeholder="Pilih Fase Pertumbuhan" />
               </SelectTrigger>
               <SelectContent>
@@ -179,8 +180,8 @@ export default function DataKomoditasPanganView() {
                 <SelectItem value="panen">Panen</SelectItem>
               </SelectContent>
             </Select>
-            {errors.fasePertumbuhan && (
-              <p className="text-red-500 text-sm mt-1">{errors.fasePertumbuhan}</p>
+            {getFieldError('food_growth_phase') && (
+              <p className="text-red-500 text-sm mt-1">{getErrorMessage('food_growth_phase')}</p>
             )}
           </div>
 
@@ -191,17 +192,15 @@ export default function DataKomoditasPanganView() {
             </Label>
             <Input
               type="number"
-              value={umurTanaman}
-              onChange={(e) => setUmurTanaman(e.target.value)}
+              {...register("food_plant_age", { valueAsNumber: true })}
               placeholder="Contoh: 15"
-              className={`h-12 rounded-xl ${
-                errors.umurTanaman 
-                  ? 'border-red-500 focus:ring-red-500' 
+              className={`h-12 rounded-xl ${getFieldError('food_plant_age')
+                  ? 'border-red-500 focus:ring-red-500'
                   : 'border-gray-200 focus:ring-green-500'
-              }`}
+                }`}
             />
-            {errors.umurTanaman && (
-              <p className="text-red-500 text-sm mt-1">{errors.umurTanaman}</p>
+            {getFieldError('food_plant_age') && (
+              <p className="text-red-500 text-sm mt-1">{getErrorMessage('food_plant_age')}</p>
             )}
           </div>
 
@@ -210,12 +209,11 @@ export default function DataKomoditasPanganView() {
             <Label className="text-sm font-semibold text-gray-700 mb-2">
               Teknologi/Metode*
             </Label>
-            <Select value={teknologiMetode} onValueChange={setTeknologiMetode}>
-              <SelectTrigger className={`w-full h-12 rounded-xl ${
-                errors.teknologiMetode 
-                  ? 'border-red-500 focus:ring-red-500' 
+            <Select onValueChange={(value) => setValue("food_technology", value)} value={foodTechnology}>
+              <SelectTrigger className={`w-full h-12 rounded-xl ${getFieldError('food_technology')
+                  ? 'border-red-500 focus:ring-red-500'
                   : 'border-gray-200 focus:ring-green-500'
-              }`}>
+                }`}>
                 <SelectValue placeholder="Pilih Teknologi/Metode" />
               </SelectTrigger>
               <SelectContent>
@@ -224,8 +222,8 @@ export default function DataKomoditasPanganView() {
                 <SelectItem value="hidroponik">Hidroponik</SelectItem>
               </SelectContent>
             </Select>
-            {errors.teknologiMetode && (
-              <p className="text-red-500 text-sm mt-1">{errors.teknologiMetode}</p>
+            {getFieldError('food_technology') && (
+              <p className="text-red-500 text-sm mt-1">{getErrorMessage('food_technology')}</p>
             )}
           </div>
 
@@ -240,33 +238,33 @@ export default function DataKomoditasPanganView() {
                   variant="outline"
                   className={cn(
                     "w-full justify-between text-left items-center font-normal px-4 py-6 rounded-xl hover:bg-gray-50 focus:ring-2 focus:border-transparent transition-all",
-                    errors.tanggalTanam 
-                      ? 'border-red-500 focus:ring-red-500' 
+                    getFieldError('food_planting_date')
+                      ? 'border-red-500 focus:ring-red-500'
                       : 'border-gray-200 focus:ring-green-500'
                   )}
                 >
                   <CalendarIcon className="mr-2 h-5 w-5 text-gray-700" />
                   {dateTanam ? (
                     <span className="text-gray-900">
-                      {formatIndonesianLong(dateTanam)}
+                      {formatIndonesianLong(new Date(dateTanam))}
                     </span>
                   ) : (
-                    <span className={errors.tanggalTanam ? 'text-red-500' : 'text-gray-400'}>Pilih tanggal kunjungan</span>
+                    <span className={getFieldError('food_planting_date') ? 'text-red-500' : 'text-gray-400'}>Pilih tanggal kunjungan</span>
                   )}
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="w-auto p-0 rounded-2xl border-gray-200" align="start">
                 <Calendar
                   mode="single"
-                  selected={dateTanam}
-                  onSelect={setDateTanam}
+                  selected={dateTanam ? new Date(dateTanam) : undefined}
+                  onSelect={(date) => setValue("food_planting_date", date?.toISOString() || "")}
                   locale={idLocale}
                   className="rounded-2xl"
                 />
               </PopoverContent>
             </Popover>
-            {errors.tanggalTanam && (
-              <p className="text-red-500 text-sm mt-1">{errors.tanggalTanam}</p>
+            {getFieldError('food_planting_date') && (
+              <p className="text-red-500 text-sm mt-1">{getErrorMessage('food_planting_date')}</p>
             )}
           </div>
 
@@ -281,33 +279,33 @@ export default function DataKomoditasPanganView() {
                   variant="outline"
                   className={cn(
                     "w-full justify-between items-center text-left font-normal px-4 py-6 rounded-xl hover:bg-gray-50 focus:ring-2 focus:border-transparent transition-all",
-                    errors.tanggalPerkiraanPanen 
-                      ? 'border-red-500 focus:ring-red-500' 
+                    getFieldError('food_harvest_date')
+                      ? 'border-red-500 focus:ring-red-500'
                       : 'border-gray-200 focus:ring-green-500'
                   )}
                 >
                   <CalendarIcon className="mr-2 h-5 w-5 text-gray-700" />
                   {datePerkiraanPanen ? (
                     <span className="text-gray-900">
-                      {formatIndonesianLong(datePerkiraanPanen)}
+                      {formatIndonesianLong(new Date(datePerkiraanPanen))}
                     </span>
                   ) : (
-                    <span className={errors.tanggalPerkiraanPanen ? 'text-red-500' : 'text-gray-400'}>Pilih tanggal kunjungan</span>
+                    <span className={getFieldError('food_harvest_date') ? 'text-red-500' : 'text-gray-400'}>Pilih tanggal kunjungan</span>
                   )}
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="w-auto p-0 rounded-2xl border-gray-200" align="start">
                 <Calendar
                   mode="single"
-                  selected={datePerkiraanPanen}
-                  onSelect={setDatePerkiraanPanen}
+                  selected={datePerkiraanPanen ? new Date(datePerkiraanPanen) : undefined}
+                  onSelect={(date) => setValue("food_harvest_date", date?.toISOString() || "")}
                   locale={idLocale}
                   className="rounded-2xl"
                 />
               </PopoverContent>
             </Popover>
-            {errors.tanggalPerkiraanPanen && (
-              <p className="text-red-500 text-sm mt-1">{errors.tanggalPerkiraanPanen}</p>
+            {getFieldError('food_harvest_date') && (
+              <p className="text-red-500 text-sm mt-1">{getErrorMessage('food_harvest_date')}</p>
             )}
           </div>
 
@@ -316,12 +314,11 @@ export default function DataKomoditasPanganView() {
             <Label className="text-sm font-semibold text-gray-700 mb-2">
               Keterangan Tanam/Panen*
             </Label>
-            <Select value={keteranganTanamPanen} onValueChange={setKeteranganTanamPanen}>
-              <SelectTrigger className={`w-full h-12 rounded-xl ${
-                errors.keteranganTanamPanen 
-                  ? 'border-red-500 focus:ring-red-500' 
+            <Select onValueChange={(value) => setValue("food_delay_reason", value)} value={foodDelayReason}>
+              <SelectTrigger className={`w-full h-12 rounded-xl ${getFieldError('food_delay_reason')
+                  ? 'border-red-500 focus:ring-red-500'
                   : 'border-gray-200 focus:ring-green-500'
-              }`}>
+                }`}>
                 <SelectValue placeholder="Pilih Keterangan Tanam/Panen" />
               </SelectTrigger>
               <SelectContent>
@@ -330,8 +327,8 @@ export default function DataKomoditasPanganView() {
                 <SelectItem value="lebih-awal">Lebih Awal</SelectItem>
               </SelectContent>
             </Select>
-            {errors.keteranganTanamPanen && (
-              <p className="text-red-500 text-sm mt-1">{errors.keteranganTanamPanen}</p>
+            {getFieldError('food_delay_reason') && (
+              <p className="text-red-500 text-sm mt-1">{getErrorMessage('food_delay_reason')}</p>
             )}
           </div>
 
@@ -342,10 +339,9 @@ export default function DataKomoditasPanganView() {
           <Label className="text-sm font-semibold text-gray-700 mb-4 mt-6">
             Foto Lokasi*
           </Label>
-          <ImageUpload 
-            onFileChange={setSelectedFile}
-            initialFile={selectedFile}
-            error={errors.fotoLokasi}
+          <ImageUpload
+            onFileChange={(file) => setValue("photos", file)}
+            error={getErrorMessage('photos')}
           />
         </div>
       </div>
@@ -362,12 +358,11 @@ export default function DataKomoditasPanganView() {
             <Label className="text-sm font-semibold text-gray-700 mb-2">
               Ada Serangan Hama/Penyakit?*
             </Label>
-            <Select value={adaSeranganHama} onValueChange={setAdaSeranganHama}>
-              <SelectTrigger className={`w-full h-12 rounded-xl ${
-                errors.adaSeranganHama 
-                  ? 'border-red-500 focus:ring-red-500' 
+            <Select onValueChange={(value) => setValue("has_pest_disease", value === "ya")} value={hasPestDisease ? "ya" : "tidak"}>
+              <SelectTrigger className={`w-full h-12 rounded-xl ${getFieldError('has_pest_disease')
+                  ? 'border-red-500 focus:ring-red-500'
                   : 'border-gray-200 focus:ring-green-500'
-              }`}>
+                }`}>
                 <SelectValue placeholder="Pilih Serangan Hama/Penyakit" />
               </SelectTrigger>
               <SelectContent>
@@ -375,8 +370,8 @@ export default function DataKomoditasPanganView() {
                 <SelectItem value="tidak">Tidak</SelectItem>
               </SelectContent>
             </Select>
-            {errors.adaSeranganHama && (
-              <p className="text-red-500 text-sm mt-1">{errors.adaSeranganHama}</p>
+            {getFieldError('has_pest_disease') && (
+              <p className="text-red-500 text-sm mt-1">{getErrorMessage('has_pest_disease')}</p>
             )}
           </div>
 
@@ -385,12 +380,11 @@ export default function DataKomoditasPanganView() {
             <Label className="text-sm font-semibold text-gray-700 mb-2">
               Jenis Hama/Penyakit Dominan*
             </Label>
-            <Select value={jenisHamaPenyakit} onValueChange={setJenisHamaPenyakit}>
-              <SelectTrigger className={`w-full h-12 rounded-xl ${
-                errors.jenisHamaPenyakit 
-                  ? 'border-red-500 focus:ring-red-500' 
+            <Select onValueChange={(value) => setValue("pest_disease_type", value)} value={pestDiseaseType}>
+              <SelectTrigger className={`w-full h-12 rounded-xl ${getFieldError('pest_disease_type')
+                  ? 'border-red-500 focus:ring-red-500'
                   : 'border-gray-200 focus:ring-green-500'
-              }`}>
+                }`}>
                 <SelectValue placeholder="Pilih Jenis Hama/Penyakit" />
               </SelectTrigger>
               <SelectContent>
@@ -399,8 +393,8 @@ export default function DataKomoditasPanganView() {
                 <SelectItem value="blast">Blast</SelectItem>
               </SelectContent>
             </Select>
-            {errors.jenisHamaPenyakit && (
-              <p className="text-red-500 text-sm mt-1">{errors.jenisHamaPenyakit}</p>
+            {getFieldError('pest_disease_type') && (
+              <p className="text-red-500 text-sm mt-1">{getErrorMessage('pest_disease_type')}</p>
             )}
           </div>
 
@@ -409,22 +403,17 @@ export default function DataKomoditasPanganView() {
             <Label className="text-sm font-semibold text-gray-700 mb-2">
               Luas Terserang Hama*
             </Label>
-            <Select value={luasSeranganHama} onValueChange={setLuasSeranganHama}>
-              <SelectTrigger className={`w-full h-12 rounded-xl ${
-                errors.luasSeranganHama 
-                  ? 'border-red-500 focus:ring-red-500' 
+            <Input
+              type="number"
+              {...register("affected_area", { valueAsNumber: true })}
+              placeholder="Contoh: 10"
+              className={`h-12 rounded-xl ${getFieldError('affected_area')
+                  ? 'border-red-500 focus:ring-red-500'
                   : 'border-gray-200 focus:ring-green-500'
-              }`}>
-                <SelectValue placeholder="Pilih Tingkat Luas Terserang" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="ringan">Ringan (0-25%)</SelectItem>
-                <SelectItem value="sedang">Sedang (26-50%)</SelectItem>
-                <SelectItem value="berat">Berat (50%)</SelectItem>
-              </SelectContent>
-            </Select>
-            {errors.luasSeranganHama && (
-              <p className="text-red-500 text-sm mt-1">{errors.luasSeranganHama}</p>
+                }`}
+            />
+            {getFieldError('affected_area') && (
+              <p className="text-red-500 text-sm mt-1">{getErrorMessage('affected_area')}</p>
             )}
           </div>
 
@@ -433,12 +422,11 @@ export default function DataKomoditasPanganView() {
             <Label className="text-sm font-semibold text-gray-700 mb-2">
               Tindakan Pengendalian Hama*
             </Label>
-            <Select value={tindakanPengendalianHama} onValueChange={setTindakanPengendalianHama}>
-              <SelectTrigger className={`w-full h-12 rounded-xl ${
-                errors.tindakanPengendalianHama 
-                  ? 'border-red-500 focus:ring-red-500' 
+            <Select onValueChange={(value) => setValue("pest_control_action", value)} value={pestControlAction}>
+              <SelectTrigger className={`w-full h-12 rounded-xl ${getFieldError('pest_control_action')
+                  ? 'border-red-500 focus:ring-red-500'
                   : 'border-gray-200 focus:ring-green-500'
-              }`}>
+                }`}>
                 <SelectValue placeholder="Pilih Tindakan Pengendalian" />
               </SelectTrigger>
               <SelectContent>
@@ -447,8 +435,8 @@ export default function DataKomoditasPanganView() {
                 <SelectItem value="hayati">Pengendalian Hayati</SelectItem>
               </SelectContent>
             </Select>
-            {errors.tindakanPengendalianHama && (
-              <p className="text-red-500 text-sm mt-1">{errors.tindakanPengendalianHama}</p>
+            {getFieldError('pest_control_action') && (
+              <p className="text-red-500 text-sm mt-1">{getErrorMessage('pest_control_action')}</p>
             )}
           </div>
 
@@ -457,12 +445,11 @@ export default function DataKomoditasPanganView() {
             <Label className="text-sm font-semibold text-gray-700 mb-2">
               Cuaca 7 Hari Terakhir*
             </Label>
-            <Select value={cuaca7Hari} onValueChange={setCuaca7Hari}>
-              <SelectTrigger className={`w-full h-12 rounded-xl ${
-                errors.cuaca7Hari 
-                  ? 'border-red-500 focus:ring-red-500' 
+            <Select onValueChange={(value) => setValue("weather_condition", value)} value={weatherCondition}>
+              <SelectTrigger className={`w-full h-12 rounded-xl ${getFieldError('weather_condition')
+                  ? 'border-red-500 focus:ring-red-500'
                   : 'border-gray-200 focus:ring-green-500'
-              }`}>
+                }`}>
                 <SelectValue placeholder="Pilih Cuaca" />
               </SelectTrigger>
               <SelectContent>
@@ -471,8 +458,8 @@ export default function DataKomoditasPanganView() {
                 <SelectItem value="hujan">Hujan</SelectItem>
               </SelectContent>
             </Select>
-            {errors.cuaca7Hari && (
-              <p className="text-red-500 text-sm mt-1">{errors.cuaca7Hari}</p>
+            {getFieldError('weather_condition') && (
+              <p className="text-red-500 text-sm mt-1">{getErrorMessage('weather_condition')}</p>
             )}
           </div>
 
@@ -481,12 +468,11 @@ export default function DataKomoditasPanganView() {
             <Label className="text-sm font-semibold text-gray-700 mb-2">
               Dampak Cuaca*
             </Label>
-            <Select value={dampakCuaca} onValueChange={setDampakCuaca}>
-              <SelectTrigger className={`w-full h-12 rounded-xl ${
-                errors.dampakCuaca 
-                  ? 'border-red-500 focus:ring-red-500' 
+            <Select onValueChange={(value) => setValue("weather_impact", value)} value={weatherImpact}>
+              <SelectTrigger className={`w-full h-12 rounded-xl ${getFieldError('weather_impact')
+                  ? 'border-red-500 focus:ring-red-500'
                   : 'border-gray-200 focus:ring-green-500'
-              }`}>
+                }`}>
                 <SelectValue placeholder="Pilih Dampak Cuaca" />
               </SelectTrigger>
               <SelectContent>
@@ -495,8 +481,8 @@ export default function DataKomoditasPanganView() {
                 <SelectItem value="banjir">Banjir/Tergenang</SelectItem>
               </SelectContent>
             </Select>
-            {errors.dampakCuaca && (
-              <p className="text-red-500 text-sm mt-1">{errors.dampakCuaca}</p>
+            {getFieldError('weather_impact') && (
+              <p className="text-red-500 text-sm mt-1">{getErrorMessage('weather_impact')}</p>
             )}
           </div>
         </div>
@@ -512,12 +498,7 @@ export default function DataKomoditasPanganView() {
           Kembali
         </Button>
         <Button
-          onClick={() => {
-            if (validateForm()) {
-              // If validation passes, navigate to next page
-              navigate("/aspirasi-tani");
-            }
-          }}
+          onClick={handleNext}
           className="sm:w-auto w-full bg-green-600 cursor-pointer hover:bg-green-700 text-white font-semibold py-6 px-10 rounded-xl transition-all duration-200 shadow-lg flex items-center justify-center gap-2"
         >
           Selanjutnya

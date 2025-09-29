@@ -12,7 +12,7 @@ interface KomoditasType {
 
 export default function KomoditasView() {
   const navigate = useNavigate();
-  const { setValue, watch, formState: { errors } } = useFormContext();
+  const { setValue, trigger, watch, formState: { errors } } = useFormContext();
 
   const selectedKomoditas = watch("selectedKomoditas"); // ambil dari form
   const komoditasList: KomoditasType[] = [
@@ -37,14 +37,14 @@ export default function KomoditasView() {
     }
   };
 
-  const handleNext = () => {
-    const selected = komoditasList.find(k => k.id === selectedKomoditas);
-    if (selected) {
-      console.log("Navigating to:", selected.navigate);
-      localStorage.setItem("komoditas", selected.id); // opsional
-      navigate(selected.navigate);
+  const handleNext = async () => {
+    const isValid = await trigger("selectedKomoditas");
+    if (isValid) {
+      const selected = komoditasList.find(k => k.id === selectedKomoditas);
+      if (selected) navigate(selected.navigate);
     }
   };
+
 
   return (
     <div className="bg-white rounded-3xl shadow-sm border border-gray-100 p-6 md:p-8">
@@ -62,28 +62,24 @@ export default function KomoditasView() {
               key={komoditas.id}
               onClick={() => handleSelect(komoditas.id as "pangan" | "hortikultura" | "perkebunan")}
               type="button"
-              className={`p-6 rounded-2xl border-2 transition-all duration-200 ${
-                isSelected
+              className={`p-6 rounded-2xl border-2 transition-all duration-200 ${isSelected
                   ? "border-green-600 bg-green-50"
                   : "border-gray-200 bg-white hover:border-green-300 hover:bg-gray-50"
-              }`}
+                }`}
             >
               <div
-                className={`w-16 h-16 rounded-2xl mx-auto mb-4 flex items-center justify-center ${
-                  isSelected ? "bg-green-600" : "bg-green-100"
-                }`}
+                className={`w-16 h-16 rounded-2xl mx-auto mb-4 flex items-center justify-center ${isSelected ? "bg-green-600" : "bg-green-100"
+                  }`}
               >
                 <Icon
                   icon={komoditas.icon}
-                  className={`w-8 h-8 ${
-                    isSelected ? "text-white" : "text-green-600"
-                  }`}
+                  className={`w-8 h-8 ${isSelected ? "text-white" : "text-green-600"
+                    }`}
                 />
               </div>
               <p
-                className={`text-center font-semibold ${
-                  isSelected ? "text-green-600" : "text-gray-700"
-                }`}
+                className={`text-center font-semibold ${isSelected ? "text-green-600" : "text-gray-700"
+                  }`}
               >
                 {komoditas.name}
               </p>
