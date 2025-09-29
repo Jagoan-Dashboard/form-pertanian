@@ -25,7 +25,7 @@ export default function DataKomoditasHortikulturaView() {
   const [luasLahan, setLuasLahan] = useState<string>("");
   const [fasePertumbuhan, setFasePertumbuhan] = useState<string>("");
   const [umurTanaman, setUmurTanaman] = useState<string>("");
-  const [keteranganTanamPanen, setKeteranganTanamPanen] = useState<string>("");
+  const [keterlambatanTanamPanen, setKeterlambatanTanamPanen] = useState<string>("");
   const [teknologiMetode, setTeknologiMetode] = useState<string>("");
   const [masalahPascapanen, setMasalahPascapanen] = useState<string>("");
   const [adaSeranganHama, setAdaSeranganHama] = useState<string>("");
@@ -64,7 +64,7 @@ const validateForm = () => {
       umurTanaman,
       tanggalTanam: dateTanam,
       tanggalPerkiraanPanen: datePerkiraanPanen,
-      keteranganTanamPanen,
+      keterlambatanTanamPanen,
       teknologiMetode,
       masalahPascapanen,
       fotoLokasi: selectedFile,
@@ -359,18 +359,18 @@ const validateForm = () => {
             )}
           </div>
 
-          {/* Keterangan Tanam/Panen */}
+          {/* Keterlambatan Tanam/Panen* */}
           <div>
             <Label className="text-sm font-semibold text-gray-700 mb-2">
-              Keterangan Tanam/Panen*
+              Keterlambatan Tanam/Panen*
             </Label>
-            <Select value={keteranganTanamPanen} onValueChange={setKeteranganTanamPanen}>
+            <Select value={keterlambatanTanamPanen} onValueChange={setKeterlambatanTanamPanen}>
               <SelectTrigger className={`w-full h-12 rounded-xl ${
-                errors.keteranganTanamPanen 
+                errors.keterlambatanTanamPanen 
                   ? 'border-red-500 focus:ring-red-500' 
                   : 'border-gray-200 focus:ring-green-500'
               }`}>
-                <SelectValue placeholder="Pilih Keterangan Tanam/Panen" />
+                <SelectValue placeholder="Pilih Keterlambatan Tanam/Panen" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="normal">Normal</SelectItem>
