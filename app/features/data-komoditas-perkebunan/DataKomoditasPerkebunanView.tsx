@@ -393,7 +393,17 @@ export default function DataKomoditasPerkebunanView() {
             <Label className="text-sm font-semibold text-gray-700 mb-2">
               Ada Serangan Hama/Penyakit?*
             </Label>
-            <Select onValueChange={(value) => setValue("has_pest_disease", value === "ya")} value={adaSeranganHama ? "ya" : "tidak"}>
+            <Select onValueChange={(value) => {
+              const hasDisease = value === "ya";
+              setValue("has_pest_disease", hasDisease, { shouldValidate: true });
+
+              // Clear related fields when "tidak" is selected
+              if (!hasDisease) {
+                setValue("pest_disease_type", "");
+                setValue("affected_area", undefined);
+                setValue("pest_control_action", "");
+              }
+            }} value={adaSeranganHama === true ? "ya" : "tidak"}>
               <SelectTrigger className={`w-full h-12 rounded-xl ${
                 getFieldError('has_pest_disease') 
                   ? 'border-red-500 focus:ring-red-500' 
@@ -437,7 +447,7 @@ export default function DataKomoditasPerkebunanView() {
 
           {/* Luas Serangan Hama */}
           <div>
-            <Label className="text-sm font-semibold text-gray-700 mb-2">
+            <Label className={`text-sm font-semibold mb-2 ${!adaSeranganHama ? 'text-gray-400' : 'text-gray-700'}`}>
               Luas Terserang Hama*
             </Label>
             <Select
@@ -446,35 +456,44 @@ export default function DataKomoditasPerkebunanView() {
                 setValue("affected_area", numValue);
               }}
               value={luasSeranganHama ? (typeof luasSeranganHama === 'number' && luasSeranganHama <= 25 ? "ringan" : typeof luasSeranganHama === 'number' && luasSeranganHama <= 50 ? "sedang" : "berat") : undefined}
+              disabled={!adaSeranganHama}
             >
               <SelectTrigger className={`w-full h-12 rounded-xl ${
-                getFieldError('affected_area') 
-                  ? 'border-red-500 focus:ring-red-500' 
-                  : 'border-gray-200 focus:ring-green-500'
+                !adaSeranganHama
+                  ? 'bg-gray-100 text-gray-400 cursor-not-allowed border-gray-200'
+                  : getFieldError('affected_area')
+                    ? 'border-red-500 focus:ring-red-500'
+                    : 'border-gray-200 focus:ring-green-500'
               }`}>
                 <SelectValue placeholder="Pilih Tingkat Luas Terserang" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="ringan">Ringan (0-25%)</SelectItem>
                 <SelectItem value="sedang">Sedang (26-50%)</SelectItem>
-                <SelectItem value="berat">Berat (50%)</SelectItem>
+                <SelectItem value="berat">Berat (&gt;50%)</SelectItem>
               </SelectContent>
             </Select>
-            {getFieldError('affected_area') && (
+            {getFieldError('affected_area') && adaSeranganHama && (
               <p className="text-red-500 text-sm mt-1">{getErrorMessage('affected_area')}</p>
             )}
           </div>
 
           {/* Tindakan Pengendalian Hama */}
           <div>
-            <Label className="text-sm font-semibold text-gray-700 mb-2">
+            <Label className={`text-sm font-semibold mb-2 ${!adaSeranganHama ? 'text-gray-400' : 'text-gray-700'}`}>
               Tindakan Pengendalian Hama*
             </Label>
-            <Select value={tindakanPengendalianHama} onValueChange={(value) => setValue("pest_control_action", value)}>
+            <Select
+              value={tindakanPengendalianHama}
+              onValueChange={(value) => setValue("pest_control_action", value)}
+              disabled={!adaSeranganHama}
+            >
               <SelectTrigger className={`w-full h-12 rounded-xl ${
-                getFieldError('pest_control_action') 
-                  ? 'border-red-500 focus:ring-red-500' 
-                  : 'border-gray-200 focus:ring-green-500'
+                !adaSeranganHama
+                  ? 'bg-gray-100 text-gray-400 cursor-not-allowed border-gray-200'
+                  : getFieldError('pest_control_action')
+                    ? 'border-red-500 focus:ring-red-500'
+                    : 'border-gray-200 focus:ring-green-500'
               }`}>
                 <SelectValue placeholder="Pilih Tindakan Pengendalian" />
               </SelectTrigger>
@@ -484,7 +503,7 @@ export default function DataKomoditasPerkebunanView() {
                 <SelectItem value="hayati">Pengendalian Hayati</SelectItem>
               </SelectContent>
             </Select>
-            {getFieldError('pest_control_action') && (
+            {getFieldError('pest_control_action') && adaSeranganHama && (
               <p className="text-red-500 text-sm mt-1">{getErrorMessage('pest_control_action')}</p>
             )}
           </div>
