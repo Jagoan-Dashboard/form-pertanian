@@ -282,7 +282,6 @@ export default function DataKomoditasPerkebunanView() {
                       : 'border-gray-200 focus:ring-green-500'
                   )}
                 >
-                  <CalendarIcon className="mr-2 h-5 w-5 text-gray-700" />
                   {dateTanam ? (
                     <span className="text-gray-900">
                       {formatIndonesianLong(new Date(dateTanam))}
@@ -290,6 +289,7 @@ export default function DataKomoditasPerkebunanView() {
                   ) : (
                     <span className={getFieldError('plantation_planting_date') ? 'text-red-500' : 'text-gray-400'}>Pilih tanggal tanam</span>
                   )}
+                  <CalendarIcon className="mr-2 h-5 w-5 text-gray-700" />
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="w-auto p-0 rounded-2xl border-gray-200" align="start">
@@ -323,7 +323,6 @@ export default function DataKomoditasPerkebunanView() {
                       : 'border-gray-200 focus:ring-green-500'
                   )}
                 >
-                  <CalendarIcon className="mr-2 h-5 w-5 text-gray-700" />
                   {datePerkiraanPanen ? (
                     <span className="text-gray-900">
                       {formatIndonesianLong(new Date(datePerkiraanPanen))}
@@ -331,6 +330,7 @@ export default function DataKomoditasPerkebunanView() {
                   ) : (
                     <span className={getFieldError('plantation_harvest_date') ? 'text-red-500' : 'text-gray-400'}>Pilih tanggal panen</span>
                   )}
+                  <CalendarIcon className="mr-2 h-5 w-5 text-gray-700" />
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="w-auto p-0 rounded-2xl border-gray-200" align="start">
@@ -483,6 +483,7 @@ export default function DataKomoditasPerkebunanView() {
               type="number"
               {...register("affected_area", { valueAsNumber: true })}
               placeholder="Contoh: 10"
+              defaultValue={0}
               disabled={!adaSeranganHama}
               className={`h-12 rounded-xl ${
                 !adaSeranganHama

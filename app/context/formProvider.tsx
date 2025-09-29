@@ -14,19 +14,42 @@ export function FormWrapper({ children }: { children: React.ReactNode }) {
 
   return (
     <RHFProvider {...methods}>
-      <form onSubmit={methods.handleSubmit((data) => {
-        const formData = new FormData();
-        Object.entries(data).forEach(([key, value]) => {
-          if (key === 'photos' && value instanceof File) {
-            formData.append(key, value);
-          } else if (value !== undefined && value !== null) {
-            formData.append(key, String(value));
-          }
-        });
-        console.log("Submit final data:", Object.fromEntries(formData.entries()));
-      })}>
+      <form
+        onSubmit={methods.handleSubmit((data) => {
+          const formData = new FormData();
+
+          Object.entries(data).forEach(([key, value]) => {
+            if (key === "photos") {
+              if (value instanceof File) {
+                // Single file
+                formData.append(key, value);
+              } else if (value instanceof FileList) {
+                // Multiple files
+                Array.from(value).forEach((file) => {
+                  formData.append(key, file);
+                });
+              } else if (Array.isArray(value)) {
+                // Array of File
+                value.forEach((file) => {
+                  if (file instanceof File) {
+                    formData.append(key, file);
+                  }
+                });
+              }
+            } else if (value !== undefined && value !== null) {
+              formData.append(key, String(value));
+            }
+          });
+
+          console.log(
+            "Submit final data:",
+            Object.fromEntries(formData.entries())
+          );
+        })}
+      >
         {children}
       </form>
+
     </RHFProvider>
   );
 }

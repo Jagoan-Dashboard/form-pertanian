@@ -266,7 +266,6 @@ export default function DataKomoditasPanganView() {
                       : 'border-gray-200 focus:ring-green-500'
                   )}
                 >
-                  <CalendarIcon className="mr-2 h-5 w-5 text-gray-700" />
                   {dateTanam ? (
                     <span className="text-gray-900">
                       {formatIndonesianLong(new Date(dateTanam))}
@@ -274,6 +273,7 @@ export default function DataKomoditasPanganView() {
                   ) : (
                     <span className={getFieldError('food_planting_date') ? 'text-red-500' : 'text-gray-400'}>Pilih tanggal kunjungan</span>
                   )}
+                  <CalendarIcon className="mr-2 h-5 w-5 text-gray-700" />
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="w-auto p-0 rounded-2xl border-gray-200" align="start">
@@ -307,7 +307,6 @@ export default function DataKomoditasPanganView() {
                       : 'border-gray-200 focus:ring-green-500'
                   )}
                 >
-                  <CalendarIcon className="mr-2 h-5 w-5 text-gray-700" />
                   {datePerkiraanPanen ? (
                     <span className="text-gray-900">
                       {formatIndonesianLong(new Date(datePerkiraanPanen))}
@@ -315,6 +314,7 @@ export default function DataKomoditasPanganView() {
                   ) : (
                     <span className={getFieldError('food_harvest_date') ? 'text-red-500' : 'text-gray-400'}>Pilih tanggal kunjungan</span>
                   )}
+                  <CalendarIcon className="mr-2 h-5 w-5 text-gray-700" />
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="w-auto p-0 rounded-2xl border-gray-200" align="start">
@@ -447,6 +447,7 @@ export default function DataKomoditasPanganView() {
               type="number"
               {...register("affected_area", { valueAsNumber: true })}
               placeholder="Contoh: 10"
+              defaultValue={0}
               disabled={!hasPestDisease}
               className={`h-12 rounded-xl ${
                 !hasPestDisease

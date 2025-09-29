@@ -13,6 +13,7 @@ import { useFormContext } from "react-hook-form";
 import { format } from "date-fns";
 import type { FullFormType } from "~/global-validation/validation-step-schemas";
 import { useNavigate } from "react-router";
+import { CalendarIcon } from "lucide-react";
 
 export function IndexView() {
   const { register, formState: { errors }, setValue, getValues, watch, trigger } = useFormContext<FullFormType>();
@@ -258,13 +259,12 @@ export function IndexView() {
                 <Button
                   variant="outline"
                   className={cn(
-                    "w-full justify-start text-left font-normal px-4 py-6 rounded-xl hover:bg-gray-50 focus:ring-2 focus:border-transparent transition-all",
+                    "w-full justify-between text-left font-normal px-4 py-6 rounded-xl hover:bg-gray-50 focus:ring-2 focus:border-transparent transition-all",
                     errors.tanggalKunjungan
                       ? 'border-red-500 focus:ring-red-500'
                       : 'border-gray-200 focus:ring-green-500'
                   )}
                 >
-                  <Icon icon="material-symbols:calendar" className="mr-2 h-5 w-5 text-gray-400" />
                   {tanggalKunjungan ? (
                     <span className="text-gray-900">
                       {formatIndonesianLong(new Date(tanggalKunjungan))}
@@ -272,6 +272,7 @@ export function IndexView() {
                   ) : (
                     <span className={`${errors.tanggalKunjungan ? 'text-red-500' : 'text-gray-400'}`}>Pilih tanggal kunjungan</span>
                   )}
+                  <CalendarIcon className="mr-2 h-5 w-5 text-gray-400" />
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="w-auto p-0 rounded-2xl border-gray-200" align="start">
