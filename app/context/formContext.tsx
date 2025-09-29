@@ -176,12 +176,19 @@ export function FormPertanianProvider({
   const prepareFormData = (data: any): FormData => {
     const formData = new FormData();
 
+    // Helper untuk format tanggal ke YYYY-MM-DD
+    const formatDate = (value?: string | Date) => {
+      if (!value) return "";
+      const d = new Date(value);
+      return isNaN(d.getTime()) ? "" : d.toISOString().split("T")[0];
+    };
+
     // Step 1–2: Data dasar
     const baseData = {
       lat: data.lat,
       long: data.long,
       extension_officer: data.extension_officer,
-      visit_date: data.visit_date,
+      visit_date: formatDate(data.visit_date || data.tanggalKunjungan),
       farmer_name: data.farmer_name,
       farmer_group: data.farmer_group,
       village: data.village,
@@ -221,8 +228,8 @@ export function FormPertanianProvider({
         plantation_growth_phase: data.plantation_growth_phase,
         plantation_plant_age: data.plantation_plant_age,
         plantation_technology: data.plantation_technology,
-        plantation_planting_date: data.plantation_planting_date,
-        plantation_harvest_date: data.plantation_harvest_date,
+        plantation_planting_date: formatDate(data.plantation_planting_date),
+        plantation_harvest_date: formatDate(data.plantation_harvest_date),
         plantation_delay_reason: data.plantation_delay_reason,
         production_problems: data.production_problems,
       };
@@ -234,8 +241,8 @@ export function FormPertanianProvider({
         horti_land_area: data.horti_land_area,
         horti_growth_phase: data.horti_growth_phase,
         horti_plant_age: data.horti_plant_age,
-        horti_planting_date: data.horti_planting_date,
-        horti_harvest_date: data.horti_harvest_date,
+        horti_planting_date: formatDate(data.horti_planting_date),
+        horti_harvest_date: formatDate(data.horti_harvest_date),
         horti_delay_reason: data.horti_delay_reason,
         horti_technology: data.horti_technology,
         post_harvest_problems: data.post_harvest_problems,
@@ -248,8 +255,8 @@ export function FormPertanianProvider({
         food_growth_phase: data.food_growth_phase,
         food_plant_age: data.food_plant_age,
         food_technology: data.food_technology,
-        food_planting_date: data.food_planting_date,
-        food_harvest_date: data.food_harvest_date,
+        food_planting_date: formatDate(data.food_planting_date),
+        food_harvest_date: formatDate(data.food_harvest_date),
         food_delay_reason: data.food_delay_reason,
       };
     }
@@ -283,6 +290,7 @@ export function FormPertanianProvider({
 
     return formData;
   };
+
 
 
   return (

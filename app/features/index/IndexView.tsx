@@ -238,7 +238,7 @@ export function IndexView() {
             </label>
             <Input
               type="text"
-              placeholder="Contoh: Penyuluh 012"
+              placeholder="Contoh: Penyuluh"
               className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all ${errors.namaPenyuluh
                 ? "border-red-500 focus:ring-red-500"
                 : "border-gray-200 focus:ring-green-500"
