@@ -10,153 +10,12 @@ import { Popover, PopoverContent, PopoverTrigger } from "~/components/ui/popover
 import { cn } from "~/lib/utils";
 import { id as idLocale } from "date-fns/locale/id";
 import { Calendar } from "~/components/ui/calendar";
-import { useNavigate } from "react-router";
-
-import { indexViewSchema } from "~/features/index/validation/validation";
+import { FormWrapper } from "~/context/formProvider";
+import { useFormContext } from "react-hook-form";
+import type { FullFormType } from "~/global-validation/validation-step-schemas";
 
 export function IndexView() {
-  const [position, setPosition] = useState<[number, number]>([-7.4034, 111.4464]); // Default: Ngawi
-  const [latitude, setLatitude] = useState('-7.4034');
-  const [longitude, setLongitude] = useState('111.4464');
-  const [isLoadingLocation, setIsLoadingLocation] = useState(false);
-  const [date, setDate] = useState<Date>();
-  const [namaPenyuluh, setNamaPenyuluh] = useState('');
-  const [namaPetani, setNamaPetani] = useState('');
-  const [namaKelompokTani, setNamaKelompokTani] = useState('');
-  const [desaKecamatan, setDesaKecamatan] = useState('');
-  const [errors, setErrors] = useState<Record<string, string>>({});
-  const navigate = useNavigate();
-
-  // Sync position dengan input values
-  useEffect(() => {
-    if (position) {
-      setLatitude(position[0].toString());
-      setLongitude(position[1].toString());
-    }
-  }, [position]);
-
-  // Handle manual input latitude
-  const handleLatitudeChange = (value: string) => {
-    setLatitude(value);
-    const lat = parseFloat(value);
-    if (!isNaN(lat) && !isNaN(parseFloat(longitude))) {
-      setPosition([lat, parseFloat(longitude)]);
-    }
-  };
-
-  // Handle manual input longitude
-  const handleLongitudeChange = (value: string) => {
-    setLongitude(value);
-    const lng = parseFloat(value);
-    if (!isNaN(lng) && !isNaN(parseFloat(latitude))) {
-      setPosition([parseFloat(latitude), lng]);
-    }
-  };
-
-  // Aktifkan GPS location
-  const aktivasiLokasi = () => {
-    setIsLoadingLocation(true);
-    
-    // Check if geolocation is supported
-    if (!("geolocation" in navigator)) {
-      alert("Geolocation tidak didukung oleh browser Anda.");
-      setIsLoadingLocation(false);
-      return;
-    }
-
-    // Check if running on localhost (HTTP) vs production (HTTPS)
-    const isSecureContext = window.isSecureContext;
-    if (!isSecureContext) {
-      console.warn("Geolocation might not work properly in non-HTTPS environment");
-    }
-
-    // Use more specific options for mobile
-    navigator.geolocation.getCurrentPosition(
-      (pos) => {
-        const newPosition: [number, number] = [pos.coords.latitude, pos.coords.longitude];
-        setPosition(newPosition);
-        setIsLoadingLocation(false);
-        console.log(`Location received: ${newPosition[0]}, ${newPosition[1]}`);
-      },
-      (error) => {
-        setIsLoadingLocation(false);
-        console.error("Error getting location:", error);
-        
-        // Provide more specific error messages
-        let errorMessage = "Tidak dapat mengakses lokasi. ";
-        switch (error.code) {
-          case error.PERMISSION_DENIED:
-            errorMessage += "Izin lokasi ditolak. Silakan aktifkan izin lokasi di pengaturan browser/device Anda.";
-            break;
-          case error.POSITION_UNAVAILABLE:
-            errorMessage += "Informasi lokasi tidak tersedia.";
-            break;
-          case error.TIMEOUT:
-            errorMessage += "Permintaan lokasi timeout.";
-            break;
-          default:
-            errorMessage += "Pastikan izin lokasi diaktifkan dan coba lagi.";
-            break;
-        }
-        alert(errorMessage);
-      },
-      {
-        enableHighAccuracy: true,  // Use GPS if available for better accuracy
-        timeout: 10000,           // 10 seconds timeout
-        maximumAge: 60000         // Accept cached position up to 1 minute old
-      }
-    );
-  };
-
-  const formatIndonesianLong = (date: Date) => {
-    const bulan = [
-      "Januari", "Februari", "Maret", "April", "Mei", "Juni",
-      "Juli", "Agustus", "September", "Oktober", "November", "Desember"
-    ];
-    return `${date.getDate()} ${bulan[date.getMonth()]} ${date.getFullYear()}`;
-  };
-
-  // Validation function
-  // Fixed validation function
-const validateForm = () => {
-  try {
-    indexViewSchema.parse({
-      latitude,
-      longitude,
-      namaPenyuluh,
-      tanggalKunjungan: date,
-      namaPetani,
-      namaKelompokTani,
-      desaKecamatan
-    });
-    
-    // If validation passes, clear errors
-    setErrors({});
-    return true;
-  } catch (error) {
-    if (error instanceof z.ZodError) {
-      const newErrors: Record<string, string> = {};
-      error.issues.forEach((err) => {
-        // Use the field path as key, not the message
-        if (err.path && err.path.length > 0) {
-          const fieldName = err.path[0] as string;
-          newErrors[fieldName] = err.message;
-        }
-      });
-      setErrors(newErrors);
-      return false;
-    }
-    return false;
-  }
-};
-  // Handle form submission
-  const handleSubmit = () => {
-    if (validateForm()) {
-      // If validation passes, navigate to next page
-      navigate("/komoditas");
-    }
-  };
-
+  const { register, formState: { errors } } = useFormContext<FullFormType>();
   console.log(errors);
 
   return (
@@ -164,7 +23,6 @@ const validateForm = () => {
       <div className="hidden sm:block">
         <Banner />
       </div>
-
       {/* Koordinat Lokasi */}
       <div className="bg-white rounded-3xl shadow-sm border border-gray-100 p-6 md:p-8">
         <div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
@@ -198,11 +56,10 @@ const validateForm = () => {
                 type="text"
                 value={latitude}
                 onChange={(e) => handleLatitudeChange(e.target.value)}
-                className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all ${
-                  errors.latitude 
-                    ? 'border-red-500 focus:ring-red-500' 
-                    : 'border-gray-200 focus:ring-green-500'
-                }`}
+                className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all ${errors.latitude
+                  ? 'border-red-500 focus:ring-red-500'
+                  : 'border-gray-200 focus:ring-green-500'
+                  }`}
                 placeholder="-7.4034"
               />
               {errors.latitude && (
@@ -218,11 +75,10 @@ const validateForm = () => {
                 type="text"
                 value={longitude}
                 onChange={(e) => handleLongitudeChange(e.target.value)}
-                className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all ${
-                  errors.longitude 
-                    ? 'border-red-500 focus:ring-red-500' 
-                    : 'border-gray-200 focus:ring-green-500'
-                }`}
+                className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all ${errors.longitude
+                  ? 'border-red-500 focus:ring-red-500'
+                  : 'border-gray-200 focus:ring-green-500'
+                  }`}
                 placeholder="111.4464"
               />
               {errors.longitude && (
@@ -271,11 +127,10 @@ const validateForm = () => {
               value={namaPenyuluh}
               onChange={(e) => setNamaPenyuluh(e.target.value)}
               placeholder="Contoh: Penyuluh 012"
-              className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all ${
-                errors.namaPenyuluh 
-                  ? 'border-red-500 focus:ring-red-500' 
-                  : 'border-gray-200 focus:ring-green-500'
-              }`}
+              className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all ${errors.namaPenyuluh
+                ? 'border-red-500 focus:ring-red-500'
+                : 'border-gray-200 focus:ring-green-500'
+                }`}
             />
             {errors.namaPenyuluh && (
               <p className="text-red-500 text-sm mt-1">{errors.namaPenyuluh}</p>
@@ -292,8 +147,8 @@ const validateForm = () => {
                   variant="outline"
                   className={cn(
                     "w-full justify-start text-left font-normal px-4 py-6 rounded-xl hover:bg-gray-50 focus:ring-2 focus:border-transparent transition-all",
-                    errors.tanggalKunjungan 
-                      ? 'border-red-500 focus:ring-red-500' 
+                    errors.tanggalKunjungan
+                      ? 'border-red-500 focus:ring-red-500'
                       : 'border-gray-200 focus:ring-green-500'
                   )}
                 >
@@ -332,11 +187,10 @@ const validateForm = () => {
               value={namaPetani}
               onChange={(e) => setNamaPetani(e.target.value)}
               placeholder="Contoh: Samsudin"
-              className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all ${
-                errors.namaPetani 
-                  ? 'border-red-500 focus:ring-red-500' 
-                  : 'border-gray-200 focus:ring-green-500'
-              }`}
+              className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all ${errors.namaPetani
+                ? 'border-red-500 focus:ring-red-500'
+                : 'border-gray-200 focus:ring-green-500'
+                }`}
             />
             {errors.namaPetani && (
               <p className="text-red-500 text-sm mt-1">{errors.namaPetani}</p>
@@ -352,11 +206,10 @@ const validateForm = () => {
               value={namaKelompokTani}
               onChange={(e) => setNamaKelompokTani(e.target.value)}
               placeholder="Contoh: Poktan Kampung Bukit"
-              className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all ${
-                errors.namaKelompokTani 
-                  ? 'border-red-500 focus:ring-red-500' 
-                  : 'border-gray-200 focus:ring-green-500'
-              }`}
+              className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all ${errors.namaKelompokTani
+                ? 'border-red-500 focus:ring-red-500'
+                : 'border-gray-200 focus:ring-green-500'
+                }`}
             />
             {errors.namaKelompokTani && (
               <p className="text-red-500 text-sm mt-1">{errors.namaKelompokTani}</p>
@@ -368,11 +221,10 @@ const validateForm = () => {
               Desa/Kecamatan*
             </label>
             <Select value={desaKecamatan} onValueChange={setDesaKecamatan}>
-              <SelectTrigger className={`w-full px-4 py-3 rounded-xl focus:ring-2 focus:border-transparent transition-all appearance-none bg-white ${
-                errors.desaKecamatan 
-                  ? 'border-red-500 focus:ring-red-500' 
-                  : 'border-gray-200 focus:ring-green-500'
-              }`}>
+              <SelectTrigger className={`w-full px-4 py-3 rounded-xl focus:ring-2 focus:border-transparent transition-all appearance-none bg-white ${errors.desaKecamatan
+                ? 'border-red-500 focus:ring-red-500'
+                : 'border-gray-200 focus:ring-green-500'
+                }`}>
                 <SelectValue placeholder="Pilih Desa/Kecamatan" />
               </SelectTrigger>
               <SelectContent>

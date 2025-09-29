@@ -105,7 +105,7 @@ export function SidebarMenu() {
                   <p className="text-xs text-gray-500">Hubungi kami</p>
                 </div>
                 <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center">
-                  <Icon icon="material-symbols:headset-mic" className="w-5 h-5 text-gray-600" />
+                  <Icon icon="mdi:phone" className="w-5 h-5 text-gray-600" />
                 </div>
               </button>
             </div>
@@ -121,7 +121,7 @@ export function SidebarMenu() {
               <img src={assets.imageLogo} alt="Logo Jagoan Data" width={120} height={120} />
             </div>
             <div className="w-9 h-9 rounded-xl bg-gray-100 flex items-center justify-center">
-              <Icon icon="material-symbols:headset-mic" className="w-6 h-6 text-gray-600" />
+              <Icon icon="mdi:phone" className="w-6 h-6 text-gray-600" />
             </div>
           </div>
           {currentStep.number === 1 && (
