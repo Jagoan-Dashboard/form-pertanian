@@ -1,5 +1,6 @@
 import { createContext, useContext, type ReactNode } from 'react';
 import { useForm, type UseFormReturn } from 'react-hook-form';
+import { useNavigate } from 'react-router';
 import apiClient from '~/lib/api-client';
 import { ENDPOINTS } from '~/lib/api-endpoints';
 
@@ -58,7 +59,7 @@ interface FormPertanianData {
   // Step 3 Universal
   has_pest_disease: boolean;
   pest_disease_type?: string;
-  affected_area?: number;
+  affected_area: number;
   pest_control_action?: string;
   weather_condition?: string;
   weather_impact?: string;
@@ -72,7 +73,7 @@ interface FormPertanianData {
   suggestions?: string;
 
   // Photos
-  photos?: FileList | File[] | string[];
+  photos?: File | null;
 }
 
 // Context Type
@@ -88,14 +89,10 @@ const FormPertanianContext = createContext<FormPertanianContextType | null>(null
 interface FormPertanianProviderProps {
   children: ReactNode;
   apiEndpoint?: string;
-  onSubmitSuccess?: (data: any) => void;
-  onSubmitError?: (error: any) => void;
 }
 
 export function FormPertanianProvider({
   children,
-  onSubmitSuccess,
-  onSubmitError,
 }: FormPertanianProviderProps) {
   const methods = useForm<FormPertanianData>({
     defaultValues: {
@@ -116,7 +113,7 @@ export function FormPertanianProvider({
       // Step 3 Universal
       has_pest_disease: false,
       pest_disease_type: '',
-      affected_area: undefined,
+      affected_area: 0,
       pest_control_action: '',
       weather_condition: '',
       weather_impact: '',
@@ -130,50 +127,56 @@ export function FormPertanianProvider({
       suggestions: '',
 
       // Photos
-      photos: [],
+      photos: null,
     },
     mode: 'onBlur',
   });
 
   const { formState } = methods;
+  const navigate = useNavigate();
 
-  const submitForm = async (externalData?: any) => {
-    // Use external data if provided, otherwise use internal methods
-    const allData = externalData || methods.getValues();
+  const submitForm = async () => {
+    const allData = methods.getValues();
 
     try {
-      console.log("🔍 Raw form data (external/internal):", allData);
-
       const payload = prepareFormData(allData);
 
-      console.log("🚀 Submitting Form Data (after prepare):", payload);
+      console.log("🚀 Submitting Form Data:", payload);
+      console.log("📊 Raw Form Data:", allData);
 
-      // Tunggu hasil API
-      const result = await apiClient.post(ENDPOINTS.CREATE_REPORT, payload);
+      const result = await apiClient.post(
+        ENDPOINTS.CREATE_REPORT,
+        payload,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
 
       console.log("✅ Submission Success:", result);
 
-      // Callback jika ada
-      // if (onSubmitSuccess) {
-      //   onSubmitSuccess(result);
-      // }
-
-      // Reset form ke default values
+      // Reset form setelah sukses
       methods.reset();
+
+      // Optional: redirect / navigate
+      // diley 2 detik lalu ke navigate
+      setTimeout(() => {
+        navigate("/");
+      }, 2000);
+
     } catch (error) {
       console.error("❌ Form submission error:", error);
-
-      if (onSubmitError) {
-        onSubmitError(error);
-      }
-
       throw error;
     }
   };
 
 
-  const prepareFormData = (data: any) => {
-    // Handle data from both FormPertanianData and FullFormType structures
+
+  const prepareFormData = (data: any): FormData => {
+    const formData = new FormData();
+
+    // Step 1–2: Data dasar
     const baseData = {
       lat: data.lat,
       long: data.long,
@@ -187,6 +190,7 @@ export function FormPertanianProvider({
       komoditas: data.komoditas,
     };
 
+    // Step 3: Universal
     const universalStep3 = {
       has_pest_disease: data.has_pest_disease,
       pest_disease_type: data.pest_disease_type,
@@ -196,6 +200,7 @@ export function FormPertanianProvider({
       weather_impact: data.weather_impact,
     };
 
+    // Step 4
     const step4Data = {
       main_constraint: data.main_constraint,
       farmer_hope: data.farmer_hope,
@@ -205,9 +210,10 @@ export function FormPertanianProvider({
       suggestions: data.suggestions,
     };
 
-    let komoditasData = {};
+    // Komoditas dinamis
+    let komoditasData: Record<string, any> = {};
 
-    if (data.selectedKomoditas === 'perkebunan') {
+    if (data.selectedKomoditas === "perkebunan") {
       komoditasData = {
         plantation_commodity: data.plantation_commodity,
         plantation_land_status: data.plantation_land_status,
@@ -220,7 +226,7 @@ export function FormPertanianProvider({
         plantation_delay_reason: data.plantation_delay_reason,
         production_problems: data.production_problems,
       };
-    } else if (data.selectedKomoditas === 'hortikultura') {
+    } else if (data.selectedKomoditas === "hortikultura") {
       komoditasData = {
         horti_commodity: data.horti_commodity,
         horti_sub_commodity: data.horti_sub_commodity,
@@ -234,7 +240,7 @@ export function FormPertanianProvider({
         horti_technology: data.horti_technology,
         post_harvest_problems: data.post_harvest_problems,
       };
-    } else if (data.selectedKomoditas === 'pangan') {
+    } else if (data.selectedKomoditas === "pangan") {
       komoditasData = {
         food_commodity: data.food_commodity,
         food_land_status: data.food_land_status,
@@ -248,14 +254,36 @@ export function FormPertanianProvider({
       };
     }
 
-    return {
+    // Gabungkan semua field (tanpa photos dulu)
+    const allData = {
       ...baseData,
       ...komoditasData,
       ...universalStep3,
       ...step4Data,
-      photos: data.photos,
     };
+
+    // Append ke FormData
+    Object.entries(allData).forEach(([key, value]) => {
+      if (value !== undefined && value !== null && value !== "") {
+        formData.append(key, String(value));
+      }
+    });
+
+    // Handle file (photos)
+    if (data.photos instanceof File) {
+      formData.append("photos", data.photos);
+    } else if (Array.isArray(data.photos)) {
+      // Jika multi-file upload
+      data.photos.forEach((file: File, idx: number) => {
+        if (file instanceof File) {
+          formData.append(`photos[${idx}]`, file);
+        }
+      });
+    }
+
+    return formData;
   };
+
 
   return (
     <FormPertanianContext.Provider
