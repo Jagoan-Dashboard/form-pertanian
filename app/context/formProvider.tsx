@@ -3,7 +3,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { createContext, useContext } from "react";
 import { FormProvider as RHFProvider, useForm, type UseFormReturn } from "react-hook-form";
-import { useNavigate } from "react-router";
 import { fullSchema, type FullFormType } from "~/global-validation/validation-step-schemas";
 import apiClient from "~/lib/api-client";
 import { ENDPOINTS } from "~/lib/api-endpoints";
@@ -28,7 +27,6 @@ export function FormProvider({ children }: { children: React.ReactNode }) {
       district: "Ngawi",
     },
   });
-  const navigate = useNavigate();
 
   const submitForm = async () => {
     try {
@@ -66,10 +64,9 @@ export function FormProvider({ children }: { children: React.ReactNode }) {
 
       // Force page refresh after form submission
       setTimeout(() => {
-        navigate("/");
-        window.location.reload();
-      }, 1000);
-  
+        window.location.href = "/";
+      }, 500);
+      
     } catch (error) {
       console.error("Form submission error:", error);
     }
