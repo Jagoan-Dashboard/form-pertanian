@@ -78,6 +78,15 @@ export function FormProvider({ children }: { children: React.ReactNode }) {
       toast.error(
         error?.response?.data?.message || "Terjadi kesalahan saat submit data!"
       );
+      // Reset form with default values to ensure complete reset
+      methods.reset({
+        affected_area: 0,
+        district: "Ngawi",
+      });
+      // Force page refresh after form submission
+      setTimeout(() => {
+        window.location.href = "/";
+      }, 500);
     }
   };
 
