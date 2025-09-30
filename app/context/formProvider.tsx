@@ -6,7 +6,8 @@ import { FormProvider as RHFProvider, useForm, type UseFormReturn } from "react-
 import { fullSchema, type FullFormType } from "~/global-validation/validation-step-schemas";
 import apiClient from "~/lib/api-client";
 import { ENDPOINTS } from "~/lib/api-endpoints";
-
+import { toast } from "sonner";
+import type { AxiosResponse } from "axios";
 // Context Type
 interface FormContextType {
   methods: UseFormReturn<FullFormType>;
@@ -31,17 +32,17 @@ export function FormProvider({ children }: { children: React.ReactNode }) {
   const submitForm = async () => {
     try {
       const formData = new FormData();
-  
+
       const formatDate = (value?: string | Date) => {
         if (!value) return "";
         const d = new Date(value);
         return isNaN(d.getTime()) ? "" : d.toISOString().split("T")[0];
       };
-  
+
       Object.entries(methods.watch()).forEach(([key, value]) => {
-        if (["visit_date","food_planting_date","food_harvest_date",
-             "horti_planting_date","horti_harvest_date", 
-             "plantation_planting_date","plantation_harvest_date"].includes(key)) {
+        if (["visit_date", "food_planting_date", "food_harvest_date",
+          "horti_planting_date", "horti_harvest_date",
+          "plantation_planting_date", "plantation_harvest_date"].includes(key)) {
           const formatted = formatDate(value);
           if (formatted) formData.append(key, formatted);
         } else if (key === "photos") {
@@ -51,10 +52,14 @@ export function FormProvider({ children }: { children: React.ReactNode }) {
           formData.append(key, String(value));
         }
       });
-  
+
       await apiClient.post(ENDPOINTS.CREATE_REPORT, formData, {
         headers: { "Content-Type": "multipart/form-data" },
-      });
+      }); //jika gagal dia tidak bisa reset methode
+
+      // ✅ Show success toast
+      toast.success("Laporan berhasil disimpan!");
+
 
       // Reset form with default values to ensure complete reset
       methods.reset({
@@ -66,12 +71,16 @@ export function FormProvider({ children }: { children: React.ReactNode }) {
       setTimeout(() => {
         window.location.href = "/";
       }, 500);
-      
-    } catch (error) {
+
+    } catch (error: any) {
       console.error("Form submission error:", error);
+      // ❌ Show error toast
+      toast.error(
+        error?.response?.data?.message || "Terjadi kesalahan saat submit data!"
+      );
     }
   };
-  
+
 
   return (
     <FormContext.Provider value={{ methods, submitForm, isSubmitting: methods.formState.isSubmitting }}>

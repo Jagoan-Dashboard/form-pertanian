@@ -8,7 +8,6 @@ import { useNavigate } from "react-router";
 import { SuccessAlert } from "~/components/SuccesAlert";
 import { checkFieldConsistency, getCharacterCount } from "./validation/validation";
 import { useFormContext } from "react-hook-form";
-import { useFormPertanian } from "~/context/formContext";
 import { useFormContextHook } from "~/context/formProvider";
 
 export default function AspirasiTaniView() {

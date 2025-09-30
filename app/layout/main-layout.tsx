@@ -4,6 +4,7 @@ import { useNavigate } from "react-router";
 import { useStepStore } from "~/store/stepStore";
 import { useEffect } from "react";
 import { FormProvider } from "~/context/formProvider";
+import { Toaster } from "sonner";
 
 export function MainLayout() {
   const navigate = useNavigate();
@@ -15,6 +16,13 @@ export function MainLayout() {
 
   return (
     <FormProvider>
+      <Toaster
+        closeButton
+        richColors
+        duration={4000}
+        expand={false}
+        position="top-center"
+      />
       <div className="min-h-screen bg-[#F8F3F5]">
         <div className="container mx-auto px-4 py-8 max-w-7xl">
           <div className="grid sm:grid-cols-4 gap-6 flex-row">
