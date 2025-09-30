@@ -2,7 +2,7 @@
 import axios from "axios";
 
 export const apiClient = axios.create({
-  baseURL: process.env.VITE_API_BASE_URL,
+  baseURL: "https://be.nandanatyo.com",
   timeout: 10000,
   headers: {
     "Content-Type": "application/json",
