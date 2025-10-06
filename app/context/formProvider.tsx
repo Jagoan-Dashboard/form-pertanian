@@ -147,9 +147,9 @@ export function FormProvider({ children }: { children: React.ReactNode }) {
       });
 
       // Force page refresh after form submission
-      setTimeout(() => {
-        window.location.href = "/";
-      }, 500);
+      // setTimeout(() => {
+      //   window.location.href = "/";
+      // }, 500);
 
     } catch (error: any) {
       console.error("Form submission error:", error);
@@ -163,9 +163,9 @@ export function FormProvider({ children }: { children: React.ReactNode }) {
         district: "Ngawi",
       });
       // Force page refresh after form submission
-      setTimeout(() => {
-        window.location.href = "/";
-      }, 500);
+      // setTimeout(() => {
+      //   window.location.href = "/";
+      // }, 500);
     }
   };
 

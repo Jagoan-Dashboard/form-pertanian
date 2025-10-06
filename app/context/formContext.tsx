@@ -239,9 +239,9 @@ export function FormPertanianProvider({
 
       // Optional: redirect / navigate
       // diley 2 detik lalu ke navigate
-      setTimeout(() => {
-        navigate("/");
-      }, 2000);
+      // setTimeout(() => {
+      //   navigate("/");
+      // }, 2000);
 
     } catch (error) {
       console.error("❌ Form submission error:", error);

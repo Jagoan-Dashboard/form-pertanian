@@ -1,0 +1,21 @@
+export const DESAKECAMATAN = [
+  "Bringin",
+  "Geneng",
+  "Gerih",
+  "Jogorogo",
+  "Karanganyar",
+  "Karangjati",
+  "Kasreman",
+  "Kendal",
+  "Kedunggalar",
+  "Kwadungan",
+  "Mantingan",
+  "Ngawi",
+  "Ngrambe",
+  "Padas",
+  "Pangkur",
+  "Paron",
+  "Pitu",
+  "Sine",
+  "Widodaren"
+]

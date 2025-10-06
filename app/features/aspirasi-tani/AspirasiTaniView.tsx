@@ -49,15 +49,15 @@ export default function AspirasiTaniView() {
         const allFormData = watch();
         console.log('🔍 AspirasiTani - All form data:', allFormData);
 
-              // Submit using submitForm
-              await submitForm();
+        // Submit using submitForm
+        await submitForm();
         // Show success alert
         setShowAlert(true);
 
         // Navigate to home after 2 seconds
-        setTimeout(() => {
-          navigate('/');
-        }, 2000);
+        // setTimeout(() => {
+        //   navigate('/');
+        // }, 2000);
       } else {
         console.log('Validation failed:', errors);
       }
