@@ -13,6 +13,8 @@ import { Icon } from "@iconify/react";
 import { ImageUpload } from "~/components/ImageUplaod";
 import { useFormContext, type FieldPath } from "react-hook-form";
 import type { FullFormType } from "~/global-validation/validation-step-schemas";
+import { FasePertumbuhanPerkebunan, KeterlambatanTanamPanen, KomoditasPerkebunanYangDitanam, MasalahProduksiPerkebunan, StatusLahan, TeknologiMethodePerkebunan } from "~/const/komoditas";
+import { Cuaca7HariTerakhir, DampakCuaca, JenisHamaPenyakit, LuastTerdampakHama } from "~/const/hama_penyakit_cuaca";
 
 export default function DataKomoditasPerkebunanView() {
   const { register, formState: { errors }, setValue, getValues, watch, trigger } = useFormContext<FullFormType>();
@@ -131,22 +133,22 @@ export default function DataKomoditasPerkebunanView() {
         <div className="grid md:grid-cols-2 gap-6">
           {/* Komoditas Perkebunan yang Ditanam */}
           <div>
-            <Label className="text-sm font-semibold text-gray-700 mb-2">
-              Komoditas Perkebunan yang Ditanam*
-            </Label>
+            <label className="text-sm font-semibold text-gray-700 mb-2">
+              Komoditas Perkebunan yang Ditanam<span className="text-red-500">*</span>
+            </label>
             <Select value={komoditasPerkebunan} onValueChange={(value) => setValue("plantation_commodity", value)}>
-              <SelectTrigger className={`w-full h-12 rounded-xl ${
-                getFieldError('plantation_commodity') 
-                  ? 'border-red-500 focus:ring-red-500' 
-                  : 'border-gray-200 focus:ring-green-500'
-              }`}>
+              <SelectTrigger className={`w-full h-12 rounded-xl ${getFieldError('plantation_commodity')
+                ? 'border-red-500 focus:ring-red-500'
+                : 'border-gray-200 focus:ring-green-500'
+                }`}>
                 <SelectValue placeholder="Pilih Komoditas Perkebunan" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="kelapa-sawit">Kelapa Sawit</SelectItem>
-                <SelectItem value="karet">Karet</SelectItem>
-                <SelectItem value="kopi">Kopi</SelectItem>
-                <SelectItem value="tebu">Tebu</SelectItem>
+                {KomoditasPerkebunanYangDitanam.map((item) => (
+                  <SelectItem key={item} value={item}>
+                    {item}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
             {getFieldError('plantation_commodity') && (
@@ -156,21 +158,22 @@ export default function DataKomoditasPerkebunanView() {
 
           {/* Status Lahan */}
           <div>
-            <Label className="text-sm font-semibold text-gray-700 mb-2">
-              Status Lahan*
-            </Label>
+            <label className="text-sm font-semibold text-gray-700 mb-2">
+              Status Lahan<span className="text-red-500">*</span>
+            </label>
             <Select value={statusLahan} onValueChange={(value) => setValue("plantation_land_status", value)}>
-              <SelectTrigger className={`w-full h-12 rounded-xl ${
-                getFieldError('plantation_land_status') 
-                  ? 'border-red-500 focus:ring-red-500' 
-                  : 'border-gray-200 focus:ring-green-500'
-              }`}>
+              <SelectTrigger className={`w-full h-12 rounded-xl ${getFieldError('plantation_land_status')
+                ? 'border-red-500 focus:ring-red-500'
+                : 'border-gray-200 focus:ring-green-500'
+                }`}>
                 <SelectValue placeholder="Pilih Status Lahan" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="milik">Milik Sendiri</SelectItem>
-                <SelectItem value="sewa">Sewa</SelectItem>
-                <SelectItem value="bagi-hasil">Bagi Hasil</SelectItem>
+                {StatusLahan.map((item) => (
+                  <SelectItem key={item} value={item}>
+                    {item}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
             {getFieldError('plantation_land_status') && (
@@ -180,18 +183,17 @@ export default function DataKomoditasPerkebunanView() {
 
           {/* Luas Lahan (Ha) */}
           <div>
-            <Label className="text-sm font-semibold text-gray-700 mb-2">
-              Luas Lahan (Ha)*
-            </Label>
+            <label className="text-sm font-semibold text-gray-700 mb-2">
+              Luas Lahan (Ha)<span className="text-red-500">*</span>
+            </label>
             <Input
               type="number"
               {...register("plantation_land_area", { valueAsNumber: true })}
               placeholder="Contoh: 10"
-              className={`h-12 rounded-xl ${
-                getFieldError('plantation_land_area') 
-                  ? 'border-red-500 focus:ring-red-500' 
-                  : 'border-gray-200 focus:ring-green-500'
-              }`}
+              className={`h-12 rounded-xl ${getFieldError('plantation_land_area')
+                ? 'border-red-500 focus:ring-red-500'
+                : 'border-gray-200 focus:ring-green-500'
+                }`}
             />
             {getFieldError('plantation_land_area') && (
               <p className="text-red-500 text-sm mt-1">{getErrorMessage('plantation_land_area')}</p>
@@ -200,21 +202,22 @@ export default function DataKomoditasPerkebunanView() {
 
           {/* Fase Pertumbuhan */}
           <div>
-            <Label className="text-sm font-semibold text-gray-700 mb-2">
-              Fase Pertumbuhan*
-            </Label>
+            <label className="text-sm font-semibold text-gray-700 mb-2">
+              Fase Pertumbuhan<span className="text-red-500">*</span>
+            </label>
             <Select value={fasePertumbuhan} onValueChange={(value) => setValue("plantation_growth_phase", value)}>
-              <SelectTrigger className={`w-full h-12 rounded-xl ${
-                getFieldError('plantation_growth_phase') 
-                  ? 'border-red-500 focus:ring-red-500' 
-                  : 'border-gray-200 focus:ring-green-500'
-              }`}>
+              <SelectTrigger className={`w-full h-12 rounded-xl ${getFieldError('plantation_growth_phase')
+                ? 'border-red-500 focus:ring-red-500'
+                : 'border-gray-200 focus:ring-green-500'
+                }`}>
                 <SelectValue placeholder="Pilih Fase Pertumbuhan" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="vegetatif">Vegetatif</SelectItem>
-                <SelectItem value="generatif">Generatif</SelectItem>
-                <SelectItem value="panen">Panen</SelectItem>
+                {FasePertumbuhanPerkebunan.map((item) => (
+                  <SelectItem key={item} value={item}>
+                    {item}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
             {getFieldError('plantation_growth_phase') && (
@@ -224,18 +227,17 @@ export default function DataKomoditasPerkebunanView() {
 
           {/* Umur Tanaman (Hari) */}
           <div>
-            <Label className="text-sm font-semibold text-gray-700 mb-2">
-              Umur Tanaman (Hari)*
-            </Label>
+            <label className="text-sm font-semibold text-gray-700 mb-2">
+              Umur Tanaman (Hari)<span className="text-red-500">*</span>
+            </label>
             <Input
               type="number"
               {...register("plantation_plant_age", { valueAsNumber: true })}
               placeholder="Contoh: 15"
-              className={`h-12 rounded-xl ${
-                getFieldError('plantation_plant_age') 
-                  ? 'border-red-500 focus:ring-red-500' 
-                  : 'border-gray-200 focus:ring-green-500'
-              }`}
+              className={`h-12 rounded-xl ${getFieldError('plantation_plant_age')
+                ? 'border-red-500 focus:ring-red-500'
+                : 'border-gray-200 focus:ring-green-500'
+                }`}
             />
             {getFieldError('plantation_plant_age') && (
               <p className="text-red-500 text-sm mt-1">{getErrorMessage('plantation_plant_age')}</p>
@@ -244,21 +246,22 @@ export default function DataKomoditasPerkebunanView() {
 
           {/* Teknologi/Metode */}
           <div>
-            <Label className="text-sm font-semibold text-gray-700 mb-2">
-              Teknologi/Metode*
-            </Label>
+            <label className="text-sm font-semibold text-gray-700 mb-2">
+              Teknologi/Metode<span className="text-red-500">*</span>
+            </label>
             <Select value={teknologiMetode} onValueChange={(value) => setValue("plantation_technology", value)}>
-              <SelectTrigger className={`w-full h-12 rounded-xl ${
-                getFieldError('plantation_technology') 
-                  ? 'border-red-500 focus:ring-red-500' 
-                  : 'border-gray-200 focus:ring-green-500'
-              }`}>
+              <SelectTrigger className={`w-full h-12 rounded-xl ${getFieldError('plantation_technology')
+                ? 'border-red-500 focus:ring-red-500'
+                : 'border-gray-200 focus:ring-green-500'
+                }`}>
                 <SelectValue placeholder="Pilih Teknologi/Metode" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="konvensional">Konvensional</SelectItem>
-                <SelectItem value="organik">Organik</SelectItem>
-                <SelectItem value="intensif">Intensif</SelectItem>
+                {TeknologiMethodePerkebunan.map((item) => (
+                  <SelectItem key={item} value={item}>
+                    {item}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
             {getFieldError('plantation_technology') && (
@@ -268,17 +271,17 @@ export default function DataKomoditasPerkebunanView() {
 
           {/* Tanggal Tanam */}
           <div>
-            <Label className="text-sm font-semibold text-gray-700 mb-2">
-              Tanggal Tanam*
-            </Label>
+            <label className="text-sm font-semibold text-gray-700 mb-2">
+              Tanggal Tanam<span className="text-red-500">*</span>
+            </label>
             <Popover>
               <PopoverTrigger asChild>
                 <Button
                   variant="outline"
                   className={cn(
                     "w-full justify-between text-left items-center font-normal px-4 py-6 rounded-xl hover:bg-gray-50 focus:ring-2 focus:border-transparent transition-all",
-                    getFieldError('plantation_planting_date') 
-                      ? 'border-red-500 focus:ring-red-500' 
+                    getFieldError('plantation_planting_date')
+                      ? 'border-red-500 focus:ring-red-500'
                       : 'border-gray-200 focus:ring-green-500'
                   )}
                 >
@@ -302,24 +305,24 @@ export default function DataKomoditasPerkebunanView() {
                 />
               </PopoverContent>
             </Popover>
-{getFieldError('plantation_planting_date') && (
+            {getFieldError('plantation_planting_date') && (
               <p className="text-red-500 text-sm mt-1">{getErrorMessage('plantation_planting_date')}</p>
             )}
           </div>
 
           {/* Tanggal Perkiraan Panen */}
           <div>
-            <Label className="text-sm font-semibold text-gray-700 mb-2">
-              Tanggal Perkiraan Panen*
-            </Label>
+            <label className="text-sm font-semibold text-gray-700 mb-2">
+              Tanggal Perkiraan Panen<span className="text-red-500">*</span>
+            </label>
             <Popover>
               <PopoverTrigger asChild>
                 <Button
                   variant="outline"
                   className={cn(
                     "w-full justify-between items-center text-left font-normal px-4 py-6 rounded-xl hover:bg-gray-50 focus:ring-2 focus:border-transparent transition-all",
-                    getFieldError('plantation_harvest_date') 
-                      ? 'border-red-500 focus:ring-red-500' 
+                    getFieldError('plantation_harvest_date')
+                      ? 'border-red-500 focus:ring-red-500'
                       : 'border-gray-200 focus:ring-green-500'
                   )}
                 >
@@ -343,28 +346,29 @@ export default function DataKomoditasPerkebunanView() {
                 />
               </PopoverContent>
             </Popover>
-{getFieldError('plantation_harvest_date') && (
+            {getFieldError('plantation_harvest_date') && (
               <p className="text-red-500 text-sm mt-1">{getErrorMessage('plantation_harvest_date')}</p>
             )}
           </div>
 
           {/* Keterlambatan Tanam/Panen */}
           <div>
-            <Label className="text-sm font-semibold text-gray-700 mb-2">
-              Keterlambatan Tanam/Panen*
-            </Label>
+            <label className="text-sm font-semibold text-gray-700 mb-2">
+              Keterlambatan Tanam/Panen<span className="text-red-500">*</span>
+            </label>
             <Select value={keterlambatanTanamPanen} onValueChange={(value) => setValue("plantation_delay_reason", value)}>
-              <SelectTrigger className={`w-full h-12 rounded-xl ${
-                getFieldError('plantation_delay_reason') 
-                  ? 'border-red-500 focus:ring-red-500' 
-                  : 'border-gray-200 focus:ring-green-500'
-              }`}>
+              <SelectTrigger className={`w-full h-12 rounded-xl ${getFieldError('plantation_delay_reason')
+                ? 'border-red-500 focus:ring-red-500'
+                : 'border-gray-200 focus:ring-green-500'
+                }`}>
                 <SelectValue placeholder="Pilih Keterlambatan Tanam/Panen" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="normal">Normal</SelectItem>
-                <SelectItem value="terlambat">Terlambat</SelectItem>
-                <SelectItem value="lebih-awal">Lebih Awal</SelectItem>
+                {KeterlambatanTanamPanen.map((item) => (
+                  <SelectItem key={item} value={item}>
+                    {item}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
             {getFieldError('plantation_delay_reason') && (
@@ -377,22 +381,22 @@ export default function DataKomoditasPerkebunanView() {
 
           {/* Masalah Produksi */}
           <div>
-            <Label className="text-sm font-semibold text-gray-700 mb-2">
-              Masalah Produksi*
-            </Label>
+            <label className="text-sm font-semibold text-gray-700 mb-2">
+              Masalah Produksi<span className="text-red-500">*</span>
+            </label>
             <Select value={masalahProduksi} onValueChange={(value) => setValue("production_problems", value)}>
-              <SelectTrigger className={`w-full h-12 rounded-xl ${
-                getFieldError('production_problems') 
-                  ? 'border-red-500 focus:ring-red-500' 
-                  : 'border-gray-200 focus:ring-green-500'
-              }`}>
+              <SelectTrigger className={`w-full h-12 rounded-xl ${getFieldError('production_problems')
+                ? 'border-red-500 focus:ring-red-500'
+                : 'border-gray-200 focus:ring-green-500'
+                }`}>
                 <SelectValue placeholder="Pilih Masalah Produksi" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="tidak-ada">Tidak Ada</SelectItem>
-                <SelectItem value="rendah">Hasil Rendah</SelectItem>
-                <SelectItem value="kualitas">Kualitas Buruk</SelectItem>
-                <SelectItem value="pasar">Masalah Pasar</SelectItem>
+                {MasalahProduksiPerkebunan.map((item) => (
+                  <SelectItem key={item} value={item}>
+                    {item}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
             {getFieldError('production_problems') && (
@@ -400,10 +404,10 @@ export default function DataKomoditasPerkebunanView() {
             )}
           </div>
         </div>
-        <div>
-          <Label className="text-sm font-semibold text-gray-700 mb-4 mt-6">
-            Foto Lokasi*
-          </Label>
+        <div className="mt-6">
+          <label className="text-sm font-semibold text-gray-700 mb-4 mt-6">
+            Foto Lokasi<span className="text-red-500">*</span>
+          </label>
           <ImageUpload
             onFileChange={(file) => setValue("photos", file)}
             error={getErrorMessage('photos')}
@@ -419,9 +423,9 @@ export default function DataKomoditasPerkebunanView() {
         <div className="grid md:grid-cols-2 gap-6">
           {/* Ada Serangan Hama/Penyakit */}
           <div>
-            <Label className="text-sm font-semibold text-gray-700 mb-2">
-              Ada Serangan Hama/Penyakit?*
-            </Label>
+            <label className="text-sm font-semibold text-gray-700 mb-2">
+              Ada Serangan Hama/Penyakit?<span className="text-red-500">*</span>
+            </label>
             <Select onValueChange={(value) => {
               const hasDisease = value === "ya";
               setValue("has_pest_disease", hasDisease, { shouldValidate: true });
@@ -433,11 +437,10 @@ export default function DataKomoditasPerkebunanView() {
                 setValue("pest_control_action", "");
               }
             }} value={pestDiseaseSelectValue}>
-              <SelectTrigger className={`w-full h-12 rounded-xl ${
-                getFieldError('has_pest_disease') 
-                  ? 'border-red-500 focus:ring-red-500' 
-                  : 'border-gray-200 focus:ring-green-500'
-              }`}>
+              <SelectTrigger className={`w-full h-12 rounded-xl ${getFieldError('has_pest_disease')
+                ? 'border-red-500 focus:ring-red-500'
+                : 'border-gray-200 focus:ring-green-500'
+                }`}>
                 <SelectValue placeholder="Pilih Serangan Hama/Penyakit" />
               </SelectTrigger>
               <SelectContent>
@@ -452,21 +455,22 @@ export default function DataKomoditasPerkebunanView() {
 
           {/* Jenis Hama/Penyakit */}
           <div>
-            <Label className="text-sm font-semibold text-gray-700 mb-2">
-              Jenis Hama/Penyakit Dominan*
-            </Label>
+            <label className="text-sm font-semibold text-gray-700 mb-2">
+              Jenis Hama/Penyakit Dominan<span className="text-red-500">*</span>
+            </label>
             <Select value={jenisHamaPenyakit} onValueChange={(value) => setValue("pest_disease_type", value)}>
-              <SelectTrigger className={`w-full h-12 rounded-xl ${
-                getFieldError('pest_disease_type') 
-                  ? 'border-red-500 focus:ring-red-500' 
-                  : 'border-gray-200 focus:ring-green-500'
-              }`}>
+              <SelectTrigger className={`w-full h-12 rounded-xl ${getFieldError('pest_disease_type')
+                ? 'border-red-500 focus:ring-red-500'
+                : 'border-gray-200 focus:ring-green-500'
+                }`}>
                 <SelectValue placeholder="Pilih Jenis Hama/Penyakit" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="wereng">Wereng</SelectItem>
-                <SelectItem value="tikus">Tikus</SelectItem>
-                <SelectItem value="blast">Blast</SelectItem>
+                {JenisHamaPenyakit.map((item) => (
+                  <SelectItem key={item} value={item}>
+                    {item}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
             {getFieldError('pest_disease_type') && (
@@ -476,23 +480,30 @@ export default function DataKomoditasPerkebunanView() {
 
           {/* Luas Serangan Hama */}
           <div>
-            <Label className={`text-sm font-semibold mb-2 ${!adaSeranganHama ? 'text-gray-400' : 'text-gray-700'}`}>
-              Luas Terserang Hama*
-            </Label>
-            <Input
-              type="number"
-              {...register("affected_area", { valueAsNumber: true })}
-              placeholder="Contoh: 10"
-              defaultValue={0}
+            <label className={`text-sm font-semibold mb-2 ${!adaSeranganHama ? 'text-gray-400' : 'text-gray-700'}`}>
+              Luas Terserang Hama<span className="text-red-500">*</span>
+            </label>
+            <Select
+              value={luasSeranganHama}
+              onValueChange={(value) => setValue("affected_area", value)}
               disabled={!adaSeranganHama}
-              className={`h-12 rounded-xl ${
-                !adaSeranganHama
+            >
+              <SelectTrigger className={`w-full h-12 rounded-xl ${!adaSeranganHama
                   ? 'bg-gray-100 text-gray-400 cursor-not-allowed border-gray-200'
                   : getFieldError('affected_area')
                     ? 'border-red-500 focus:ring-red-500'
                     : 'border-gray-200 focus:ring-green-500'
-                }`}
-            />
+                }`}>
+                <SelectValue placeholder="Pilih Luas Terserang Hama" />
+              </SelectTrigger>
+              <SelectContent>
+                {LuastTerdampakHama.map((item) => (
+                  <SelectItem key={item} value={item}>
+                    {item}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
             {getFieldError('affected_area') && adaSeranganHama && (
               <p className="text-red-500 text-sm mt-1">{getErrorMessage('affected_area')}</p>
             )}
@@ -500,21 +511,20 @@ export default function DataKomoditasPerkebunanView() {
 
           {/* Tindakan Pengendalian Hama */}
           <div>
-            <Label className={`text-sm font-semibold mb-2 ${!adaSeranganHama ? 'text-gray-400' : 'text-gray-700'}`}>
+            <label className={`text-sm font-semibold mb-2 ${!adaSeranganHama ? 'text-gray-400' : 'text-gray-700'}`}>
               Tindakan Pengendalian Hama*
-            </Label>
+            </label>
             <Select
               value={tindakanPengendalianHama}
               onValueChange={(value) => setValue("pest_control_action", value)}
               disabled={!adaSeranganHama}
             >
-              <SelectTrigger className={`w-full h-12 rounded-xl ${
-                !adaSeranganHama
-                  ? 'bg-gray-100 text-gray-400 cursor-not-allowed border-gray-200'
-                  : getFieldError('pest_control_action')
-                    ? 'border-red-500 focus:ring-red-500'
-                    : 'border-gray-200 focus:ring-green-500'
-              }`}>
+              <SelectTrigger className={`w-full h-12 rounded-xl ${!adaSeranganHama
+                ? 'bg-gray-100 text-gray-400 cursor-not-allowed border-gray-200'
+                : getFieldError('pest_control_action')
+                  ? 'border-red-500 focus:ring-red-500'
+                  : 'border-gray-200 focus:ring-green-500'
+                }`}>
                 <SelectValue placeholder="Pilih Tindakan Pengendalian" />
               </SelectTrigger>
               <SelectContent>
@@ -530,21 +540,22 @@ export default function DataKomoditasPerkebunanView() {
 
           {/* Cuaca 7 Hari Terakhir */}
           <div>
-            <Label className="text-sm font-semibold text-gray-700 mb-2">
-              Cuaca 7 Hari Terakhir*
-            </Label>
+            <label className="text-sm font-semibold text-gray-700 mb-2">
+              Cuaca 7 Hari Terakhir<span className="text-red-500">*</span>
+            </label>
             <Select value={cuaca7Hari} onValueChange={(value) => setValue("weather_condition", value)}>
-              <SelectTrigger className={`w-full h-12 rounded-xl ${
-                getFieldError('weather_condition') 
-                  ? 'border-red-500 focus:ring-red-500' 
-                  : 'border-gray-200 focus:ring-green-500'
-              }`}>
+              <SelectTrigger className={`w-full h-12 rounded-xl ${getFieldError('weather_condition')
+                ? 'border-red-500 focus:ring-red-500'
+                : 'border-gray-200 focus:ring-green-500'
+                }`}>
                 <SelectValue placeholder="Pilih Cuaca" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="cerah">Cerah</SelectItem>
-                <SelectItem value="berawan">Berawan</SelectItem>
-                <SelectItem value="hujan">Hujan</SelectItem>
+                {Cuaca7HariTerakhir.map((item) => (
+                  <SelectItem key={item} value={item}>
+                    {item}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
             {getFieldError('weather_condition') && (
@@ -554,21 +565,22 @@ export default function DataKomoditasPerkebunanView() {
 
           {/* Dampak Cuaca */}
           <div>
-            <Label className="text-sm font-semibold text-gray-700 mb-2">
-              Dampak Cuaca*
-            </Label>
+            <label className="text-sm font-semibold text-gray-700 mb-2">
+              Dampak Cuaca <span className="text-red-500">*</span>
+            </label>
             <Select value={dampakCuaca} onValueChange={(value) => setValue("weather_impact", value)}>
-              <SelectTrigger className={`w-full h-12 rounded-xl ${
-                getFieldError('weather_impact') 
-                  ? 'border-red-500 focus:ring-red-500' 
-                  : 'border-gray-200 focus:ring-green-500'
-              }`}>
+              <SelectTrigger className={`w-full h-12 rounded-xl ${getFieldError('weather_impact')
+                ? 'border-red-500 focus:ring-red-500'
+                : 'border-gray-200 focus:ring-green-500'
+                }`}>
                 <SelectValue placeholder="Pilih Dampak Cuaca" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="baik">Baik/Normal</SelectItem>
-                <SelectItem value="kekeringan">Kekeringan</SelectItem>
-                <SelectItem value="banjir">Banjir/Tergenang</SelectItem>
+                {DampakCuaca.map((item) => (
+                  <SelectItem key={item} value={item}>
+                    {item}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
             {getFieldError('weather_impact') && (

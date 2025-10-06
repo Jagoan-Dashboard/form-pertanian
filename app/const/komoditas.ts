@@ -121,3 +121,12 @@ export const MasalahProduksiPerkebunan = [
   "Perlu Replanting",
   "Lainnya"
 ]
+export const TeknologiMethodePerkebunan=[
+  "Tidak ada",
+  "Peremajaan Tanaman (Replanting)",
+  "Pupuk Organik / Hayati",
+  "Irigasi Tetes / Sprinkler",
+  "Drone Monitoring",
+  "Sistem Agroforestry",
+  "Lainnya"
+]
