@@ -9,6 +9,7 @@ import { SuccessAlert } from "~/components/SuccesAlert";
 import { checkFieldConsistency, getCharacterCount } from "./validation/validation";
 import { useFormContext } from "react-hook-form";
 import { useFormContextHook } from "~/context/formProvider";
+import { AksesAirPertanian, Harapan, KebutuhanMendesak, KendalaUtama, PelatihanYangDibutuhkan } from "~/const/aspirasi-tani";
 
 export default function AspirasiTaniView() {
   const navigate = useNavigate();
@@ -86,9 +87,9 @@ export default function AspirasiTaniView() {
           <div className="grid md:grid-cols-2 gap-6">
             {/* Kendala Utama */}
             <div>
-              <Label className="text-sm font-semibold text-gray-700 mb-2">
-                Kendala Utama*
-              </Label>
+              <label className="text-sm font-semibold text-gray-700 mb-2">
+                Kendala Utama<span className="text-red-500">*</span>
+              </label>
               <Select
                 value={main_constraint || ''}
                 onValueChange={(value) => {
@@ -100,12 +101,11 @@ export default function AspirasiTaniView() {
                   <SelectValue placeholder="Pilih Kendala Utama" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="modal">Modal Terbatas</SelectItem>
-                  <SelectItem value="hama">Serangan Hama/Penyakit</SelectItem>
-                  <SelectItem value="cuaca">Cuaca Tidak Menentu</SelectItem>
-                  <SelectItem value="pupuk">Harga Pupuk Mahal</SelectItem>
-                  <SelectItem value="air">Kekurangan Air</SelectItem>
-                  <SelectItem value="lainnya">Lainnya</SelectItem>
+                  {KendalaUtama.map((item) => (
+                    <SelectItem key={item} value={item}>
+                      {item}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
               {getFieldError('main_constraint') && (
@@ -115,9 +115,9 @@ export default function AspirasiTaniView() {
 
             {/* Harapan */}
             <div>
-              <Label className="text-sm font-semibold text-gray-700 mb-2">
-                Harapan*
-              </Label>
+              <label className="text-sm font-semibold text-gray-700 mb-2">
+                Harapan<span className="text-red-500">*</span>
+              </label>
               <Select
                 value={farmer_hope || ''}
                 onValueChange={(value) => {
@@ -129,12 +129,11 @@ export default function AspirasiTaniView() {
                   <SelectValue placeholder="Pilih Harapan" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="subsidi">Subsidi Pupuk/Bibit</SelectItem>
-                  <SelectItem value="pelatihan">Pelatihan/Pendampingan</SelectItem>
-                  <SelectItem value="bantuan-modal">Bantuan Modal</SelectItem>
-                  <SelectItem value="teknologi">Akses Teknologi</SelectItem>
-                  <SelectItem value="pasar">Akses Pasar</SelectItem>
-                  <SelectItem value="lainnya">Lainnya</SelectItem>
+                  {Harapan.map((item) => (
+                    <SelectItem key={item} value={item}>
+                      {item}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
               {getFieldError('farmer_hope') && (
@@ -144,9 +143,9 @@ export default function AspirasiTaniView() {
 
             {/* Pelatihan yang Dibutuhkan */}
             <div>
-              <Label className="text-sm font-semibold text-gray-700 mb-2">
-                Pelatihan yang Dibutuhkan*
-              </Label>
+              <label className="text-sm font-semibold text-gray-700 mb-2">
+                Pelatihan yang Dibutuhkan<span className="text-red-500">*</span>
+              </label>
               <Select
                 value={training_needed || ''}
                 onValueChange={(value) => {
@@ -158,12 +157,11 @@ export default function AspirasiTaniView() {
                   <SelectValue placeholder="Pilih Pelatihan yang Dibutuhkan" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="budidaya">Teknik Budidaya Modern</SelectItem>
-                  <SelectItem value="organik">Pertanian Organik</SelectItem>
-                  <SelectItem value="hama">Pengendalian Hama Terpadu</SelectItem>
-                  <SelectItem value="pasca-panen">Pasca Panen</SelectItem>
-                  <SelectItem value="manajemen">Manajemen Usaha Tani</SelectItem>
-                  <SelectItem value="teknologi">Penggunaan Teknologi</SelectItem>
+                  {PelatihanYangDibutuhkan.map((item) => (
+                    <SelectItem key={item} value={item}>
+                      {item}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
               {getFieldError('training_needed') && (
@@ -173,9 +171,9 @@ export default function AspirasiTaniView() {
 
             {/* Kebutuhan Mendesak */}
             <div>
-              <Label className="text-sm font-semibold text-gray-700 mb-2">
-                Kebutuhan Mendesak*
-              </Label>
+              <label className="text-sm font-semibold text-gray-700 mb-2">
+                Kebutuhan Mendesak<span className="text-red-500">*</span>
+              </label>
               <Select
                 value={urgent_needs || ''}
                 onValueChange={(value) => {
@@ -187,12 +185,11 @@ export default function AspirasiTaniView() {
                   <SelectValue placeholder="Pilih Kebutuhan Mendesak" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="pupuk">Pupuk</SelectItem>
-                  <SelectItem value="pestisida">Pestisida</SelectItem>
-                  <SelectItem value="bibit">Bibit Unggul</SelectItem>
-                  <SelectItem value="alat">Alat Pertanian</SelectItem>
-                  <SelectItem value="modal">Modal Usaha</SelectItem>
-                  <SelectItem value="irigasi">Perbaikan Irigasi</SelectItem>
+                  {KebutuhanMendesak.map((item) => (
+                    <SelectItem key={item} value={item}>
+                      {item}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
               {getFieldError('urgent_needs') && (
@@ -202,9 +199,9 @@ export default function AspirasiTaniView() {
 
             {/* Akses Air Pertanian (P2T) */}
             <div className="md:col-span-2">
-              <Label className="text-sm font-semibold text-gray-700 mb-2">
-                Akses Air Pertanian (P2T)*
-              </Label>
+              <label className="text-sm font-semibold text-gray-700 mb-2">
+                Akses Air Pertanian (P2T)<span className="text-red-500">*</span>
+              </label>
               <Select
                 value={water_access || ''}
                 onValueChange={(value) => {
@@ -216,10 +213,11 @@ export default function AspirasiTaniView() {
                   <SelectValue placeholder="Pilih Akses Air Pertanian" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="baik">Baik - Tersedia Sepanjang Tahun</SelectItem>
-                  <SelectItem value="cukup">Cukup - Tersedia Saat Musim Hujan</SelectItem>
-                  <SelectItem value="terbatas">Terbatas - Sering Kekurangan</SelectItem>
-                  <SelectItem value="tidak-ada">Tidak Ada Akses</SelectItem>
+                  {AksesAirPertanian.map((item) => (
+                    <SelectItem key={item} value={item}>
+                      {item}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
               {getFieldError('water_access') && (
@@ -236,9 +234,9 @@ export default function AspirasiTaniView() {
           </h2>
 
           <div>
-            <Label className="text-sm font-semibold text-gray-700 mb-2">
+            <label className="text-sm font-semibold text-gray-700 mb-2">
               Apa harapan dan saran Bapak/Ibu ke depan agar pertanian lebih baik?*
-            </Label>
+            </label>
             <Textarea
               value={suggestions || ''}
               onChange={(e: any) => {
