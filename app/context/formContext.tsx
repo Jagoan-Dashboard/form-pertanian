@@ -1,11 +1,11 @@
-import { createContext, useContext, type ReactNode } from 'react';
+import { createContext, useContext, useEffect, type ReactNode } from 'react';
 import { useForm, type UseFormReturn } from 'react-hook-form';
 import { useNavigate } from 'react-router';
 import apiClient from '~/lib/api-client';
 import { ENDPOINTS } from '~/lib/api-endpoints';
 
 // Form Data Interface
-interface FormPertanianData {
+export interface FormPertanianData {
   // Step 1
   lat: string;
   long: string;
@@ -99,44 +99,9 @@ export function FormPertanianProvider({
 }: FormPertanianProviderProps) {
   // Load initial values from localStorage
   const getInitialValues = (): FormPertanianData => {
-    try {
-      const stored = localStorage.getItem(FORM_STORAGE_KEY);
-      if (stored) {
-        const parsed = JSON.parse(stored);
-        return {
-          // Ensure we have default values for missing fields
-          lat: '',
-          long: '',
-          extension_officer: '',
-          visit_date: '',
-          farmer_name: '',
-          farmer_group: '',
-          village: '',
-          district: '',
-          selectedKomoditas: '',
-          komoditas: undefined,
-          has_pest_disease: false,
-          pest_disease_type: '',
-          affected_area: 0,
-          pest_control_action: '',
-          weather_condition: '',
-          weather_impact: '',
-          main_constraint: '',
-          farmer_hope: '',
-          training_needed: '',
-          urgent_needs: '',
-          water_access: '',
-          suggestions: '',
-          photos: null,
-          ...parsed
-        };
-      }
-    } catch (error) {
-      console.error("Failed to load form data from localStorage:", error);
-    }
-
-    // Return default values if no stored data
-    return {
+    // Define a complete default object that matches FormPertanianData
+    const defaultFormValues: FormPertanianData = {
+      // Step 1
       lat: '',
       long: '',
       extension_officer: '',
@@ -149,6 +114,42 @@ export function FormPertanianProvider({
       // Step 2
       selectedKomoditas: '',
       komoditas: undefined,
+
+      // Perkebunan fields (Step 2/3)
+      plantation_commodity: '',
+      plantation_land_status: '',
+      plantation_land_area: 0,
+      plantation_growth_phase: '',
+      plantation_plant_age: 0,
+      plantation_technology: '',
+      plantation_planting_date: '',
+      plantation_harvest_date: '',
+      plantation_delay_reason: '',
+      production_problems: '',
+
+      // Hortikultura fields (Step 2/3)
+      horti_commodity: '',
+      horti_sub_commodity: '',
+      horti_land_status: '',
+      horti_land_area: 0,
+      horti_growth_phase: '',
+      horti_plant_age: 0,
+      horti_planting_date: '',
+      horti_harvest_date: '',
+      horti_delay_reason: '',
+      horti_technology: '',
+      post_harvest_problems: '',
+
+      // Pangan fields (Step 2/3)
+      food_commodity: '',
+      food_land_status: '',
+      food_land_area: 0,
+      food_growth_phase: '',
+      food_plant_age: 0,
+      food_technology: '',
+      food_planting_date: '',
+      food_harvest_date: '',
+      food_delay_reason: '',
 
       // Step 3 Universal
       has_pest_disease: false,
@@ -169,6 +170,23 @@ export function FormPertanianProvider({
       // Photos
       photos: null,
     };
+
+    try {
+      const stored = localStorage.getItem(FORM_STORAGE_KEY);
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        // Merge stored data with default values to ensure all required fields are present
+        return {
+          ...defaultFormValues,
+          ...parsed
+        };
+      }
+    } catch (error) {
+      console.error("Failed to load form data from localStorage:", error);
+    }
+
+    // Return complete default values if no stored data
+    return defaultFormValues;
   };
 
   const methods = useForm<FormPertanianData>({

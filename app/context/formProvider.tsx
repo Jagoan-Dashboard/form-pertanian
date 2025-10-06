@@ -23,15 +23,58 @@ const FormContext = createContext<FormContextType | null>(null);
 export function FormProvider({ children }: { children: React.ReactNode }) {
   // Load initial values from localStorage
   const getInitialValues = (): FullFormType => {
+    // Define a complete default object that matches FullFormType
+    const defaultFormValues: FullFormType = {
+      // From indexViewSchema (Step 1)
+      lat: "",
+      long: "",
+      extension_officer: "",
+      visit_date: "",
+      farmer_name: "",
+      farmer_group: "",
+      village: "",
+      district: "Ngawi", // Default value
+      
+      // From data komoditas schemas - Initialize with a default selection to satisfy discriminated union
+      komoditas: "pangan", // Default to one of the valid union options to satisfy the schema
+      // Only include fields that are part of the pangan schema to satisfy the discriminated union
+      food_commodity: "",
+      food_land_status: "",
+      food_land_area: 0,
+      food_growth_phase: "",
+      food_plant_age: 0,
+      food_technology: "",
+      food_planting_date: "",
+      food_harvest_date: "",
+      food_delay_reason: "",
+      
+      // From aspirasiTaniSchema (Step 4)
+      main_constraint: "",
+      farmer_hope: "",
+      training_needed: "",
+      urgent_needs: "",
+      water_access: "",
+      suggestions: "",
+      
+      // Universal fields
+      affected_area: 0,
+      has_pest_disease: false,
+      pest_disease_type: "",
+      pest_control_action: "",
+      weather_condition: "",
+      weather_impact: "",
+      
+      // Photos
+      photos: null,
+    };
+
     try {
       const stored = localStorage.getItem(FORM_STORAGE_KEY);
       if (stored) {
         const parsed = JSON.parse(stored);
+        // Merge stored data with default values to ensure all required fields are present
         return {
-          // Ensure we have default values for missing fields
-          affected_area: 0,
-          has_pest_disease: false,
-          district: "Ngawi",
+          ...defaultFormValues,
           ...parsed
         };
       }
@@ -39,12 +82,8 @@ export function FormProvider({ children }: { children: React.ReactNode }) {
       console.error("Failed to load form data from localStorage:", error);
     }
 
-    // Return default values if no stored data
-    return {
-      affected_area: 0,
-      has_pest_disease: false,
-      district: "Ngawi",
-    };
+    // Return complete default values if no stored data
+    return defaultFormValues;
   };
 
   const methods = useForm<FullFormType>({
