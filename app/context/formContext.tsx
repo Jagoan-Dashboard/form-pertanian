@@ -91,12 +91,52 @@ interface FormPertanianProviderProps {
   apiEndpoint?: string;
 }
 
+// Key for localStorage
+const FORM_STORAGE_KEY = "form-pertanian-data";
+
 export function FormPertanianProvider({
   children,
 }: FormPertanianProviderProps) {
-  const methods = useForm<FormPertanianData>({
-    defaultValues: {
-      // Step 1
+  // Load initial values from localStorage
+  const getInitialValues = (): FormPertanianData => {
+    try {
+      const stored = localStorage.getItem(FORM_STORAGE_KEY);
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        return {
+          // Ensure we have default values for missing fields
+          lat: '',
+          long: '',
+          extension_officer: '',
+          visit_date: '',
+          farmer_name: '',
+          farmer_group: '',
+          village: '',
+          district: '',
+          selectedKomoditas: '',
+          komoditas: undefined,
+          has_pest_disease: false,
+          pest_disease_type: '',
+          affected_area: 0,
+          pest_control_action: '',
+          weather_condition: '',
+          weather_impact: '',
+          main_constraint: '',
+          farmer_hope: '',
+          training_needed: '',
+          urgent_needs: '',
+          water_access: '',
+          suggestions: '',
+          photos: null,
+          ...parsed
+        };
+      }
+    } catch (error) {
+      console.error("Failed to load form data from localStorage:", error);
+    }
+
+    // Return default values if no stored data
+    return {
       lat: '',
       long: '',
       extension_officer: '',
@@ -128,9 +168,26 @@ export function FormPertanianProvider({
 
       // Photos
       photos: null,
-    },
+    };
+  };
+
+  const methods = useForm<FormPertanianData>({
+    defaultValues: getInitialValues(),
     mode: 'onBlur',
   });
+
+  // Subscribe to form changes and save to localStorage
+  useEffect(() => {
+    const subscription = methods.watch((value) => {
+      try {
+        localStorage.setItem(FORM_STORAGE_KEY, JSON.stringify(value));
+      } catch (error) {
+        console.error("Failed to save form data to localStorage:", error);
+      }
+    });
+    
+    return () => subscription.unsubscribe();
+  }, [methods]);
 
   const { formState } = methods;
   const navigate = useNavigate();
@@ -155,6 +212,9 @@ export function FormPertanianProvider({
       );
 
       console.log("✅ Submission Success:", result);
+
+      // Clear stored form data on successful submission
+      localStorage.removeItem(FORM_STORAGE_KEY);
 
       // Reset form setelah sukses
       methods.reset();

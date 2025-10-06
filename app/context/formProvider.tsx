@@ -1,13 +1,16 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { createContext, useContext } from "react";
+import { createContext, useContext, useEffect } from "react";
 import { FormProvider as RHFProvider, useForm, type UseFormReturn } from "react-hook-form";
 import { fullSchema, type FullFormType } from "~/global-validation/validation-step-schemas";
 import apiClient from "~/lib/api-client";
 import { ENDPOINTS } from "~/lib/api-endpoints";
 import { toast } from "sonner";
-import type { AxiosResponse } from "axios";
+
+// Key for localStorage
+const FORM_STORAGE_KEY = "form-pertanian-data";
+
 // Context Type
 interface FormContextType {
   methods: UseFormReturn<FullFormType>;
@@ -18,16 +21,51 @@ interface FormContextType {
 const FormContext = createContext<FormContextType | null>(null);
 
 export function FormProvider({ children }: { children: React.ReactNode }) {
+  // Load initial values from localStorage
+  const getInitialValues = (): FullFormType => {
+    try {
+      const stored = localStorage.getItem(FORM_STORAGE_KEY);
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        return {
+          // Ensure we have default values for missing fields
+          affected_area: 0,
+          has_pest_disease: false,
+          district: "Ngawi",
+          ...parsed
+        };
+      }
+    } catch (error) {
+      console.error("Failed to load form data from localStorage:", error);
+    }
+
+    // Return default values if no stored data
+    return {
+      affected_area: 0,
+      has_pest_disease: false,
+      district: "Ngawi",
+    };
+  };
+
   const methods = useForm<FullFormType>({
     resolver: zodResolver(fullSchema),
     mode: "onSubmit",
     reValidateMode: "onChange",
-    defaultValues: {
-      affected_area: 0,
-      has_pest_disease: false,
-      district: "Ngawi",
-    },
+    defaultValues: getInitialValues(),
   });
+
+  // Subscribe to form changes and save to localStorage
+  useEffect(() => {
+    const subscription = methods.watch((value) => {
+      try {
+        localStorage.setItem(FORM_STORAGE_KEY, JSON.stringify(value));
+      } catch (error) {
+        console.error("Failed to save form data to localStorage:", error);
+      }
+    });
+    
+    return () => subscription.unsubscribe();
+  }, [methods]);
 
   const submitForm = async () => {
     try {
@@ -60,6 +98,8 @@ export function FormProvider({ children }: { children: React.ReactNode }) {
       // ✅ Show success toast
       toast.success("Laporan berhasil disimpan!");
 
+      // Clear stored form data on successful submission
+      localStorage.removeItem(FORM_STORAGE_KEY);
 
       // Reset form with default values to ensure complete reset
       methods.reset({
