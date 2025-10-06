@@ -13,6 +13,8 @@ import { useNavigate } from "react-router";
 import { ImageUpload } from "~/components/ImageUplaod";
 import { useFormContext } from "react-hook-form";
 import type { FullFormType } from "~/global-validation/validation-step-schemas";
+import { FasePertumbuhanPangan, KeterlambatanTanamPanen, KomoditasPanganYangDitanam, StatusLahan, TeknologiMethodePangan } from "~/const/komoditas";
+import { Cuaca7HariTerakhir, DampakCuaca, JenisHamaPenyakit, LuastTerdampakHama, TindakanPengendalianHama } from "~/const/hama_penyakit_cuaca";
 
 export default function DataKomoditasPanganView() {
   const { register, formState: { errors }, setValue, getValues, watch, trigger } = useFormContext<FullFormType>();
@@ -122,9 +124,9 @@ export default function DataKomoditasPanganView() {
         <div className="grid md:grid-cols-2 gap-6">
           {/* Komoditas Pangan */}
           <div>
-            <Label className="text-sm font-semibold text-gray-700 mb-2">
-              Komoditas Pangan yang Ditanam*
-            </Label>
+            <label className="text-sm font-semibold text-gray-700 mb-2">
+              Komoditas Pangan yang Ditanam<span className="text-red-500">*</span>
+            </label>
             <Select onValueChange={(value) => setValue("food_commodity", value)} value={foodCommodity}>
               <SelectTrigger className={`w-full h-12 rounded-xl ${getFieldError('food_commodity')
                   ? 'border-red-500 focus:ring-red-500'
@@ -133,9 +135,11 @@ export default function DataKomoditasPanganView() {
                 <SelectValue placeholder="Pilih Komoditas Pangan" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="padi">Padi</SelectItem>
-                <SelectItem value="jagung">Jagung</SelectItem>
-                <SelectItem value="kedelai">Kedelai</SelectItem>
+                {KomoditasPanganYangDitanam.map((item) => (
+                  <SelectItem key={item} value={item}>
+                    {item}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
             {getFieldError('food_commodity') && (
@@ -145,9 +149,9 @@ export default function DataKomoditasPanganView() {
 
           {/* Status Lahan */}
           <div>
-            <Label className="text-sm font-semibold text-gray-700 mb-2">
-              Status Lahan*
-            </Label>
+            <label className="text-sm font-semibold text-gray-700 mb-2">
+              Status Lahan<span className="text-red-500">*</span>
+            </label>
             <Select onValueChange={(value) => setValue("food_land_status", value)} value={foodLandStatus}>
               <SelectTrigger className={`w-full h-12 rounded-xl ${getFieldError('food_land_status')
                   ? 'border-red-500 focus:ring-red-500'
@@ -156,9 +160,11 @@ export default function DataKomoditasPanganView() {
                 <SelectValue placeholder="Pilih Status Lahan" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="milik">Milik Sendiri</SelectItem>
-                <SelectItem value="sewa">Sewa</SelectItem>
-                <SelectItem value="bagi-hasil">Bagi Hasil</SelectItem>
+                {StatusLahan.map((item) => (
+                  <SelectItem key={item} value={item}>
+                    {item}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
             {getFieldError('food_land_status') && (
@@ -168,9 +174,9 @@ export default function DataKomoditasPanganView() {
 
           {/* Luas Lahan */}
           <div>
-            <Label className="text-sm font-semibold text-gray-700 mb-2">
-              Luas Lahan (Ha)*
-            </Label>
+            <label className="text-sm font-semibold text-gray-700 mb-2">
+              Luas Lahan (Ha)<span className="text-red-500">*</span>
+            </label>
             <Input
               type="number"
               {...register("food_land_area", { valueAsNumber: true })}
@@ -187,9 +193,9 @@ export default function DataKomoditasPanganView() {
 
           {/* Fase Pertumbuhan */}
           <div>
-            <Label className="text-sm font-semibold text-gray-700 mb-2">
-              Fase Pertumbuhan*
-            </Label>
+            <label className="text-sm font-semibold text-gray-700 mb-2">
+              Fase Pertumbuhan<span className="text-red-500">*</span>
+            </label>
             <Select onValueChange={(value) => setValue("food_growth_phase", value)} value={foodGrowthPhase}>
               <SelectTrigger className={`w-full h-12 rounded-xl ${getFieldError('food_growth_phase')
                   ? 'border-red-500 focus:ring-red-500'
@@ -198,9 +204,11 @@ export default function DataKomoditasPanganView() {
                 <SelectValue placeholder="Pilih Fase Pertumbuhan" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="vegetatif">Vegetatif</SelectItem>
-                <SelectItem value="generatif">Generatif</SelectItem>
-                <SelectItem value="panen">Panen</SelectItem>
+                {FasePertumbuhanPangan.map((item) => (
+                  <SelectItem key={item} value={item}>
+                    {item}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
             {getFieldError('food_growth_phase') && (
@@ -210,9 +218,9 @@ export default function DataKomoditasPanganView() {
 
           {/* Umur Tanaman */}
           <div>
-            <Label className="text-sm font-semibold text-gray-700 mb-2">
-              Umur Tanaman (Hari)*
-            </Label>
+            <label className="text-sm font-semibold text-gray-700 mb-2">
+              Umur Tanaman (Hari)<span className="text-red-500">*</span>
+            </label>
             <Input
               type="number"
               {...register("food_plant_age", { valueAsNumber: true })}
@@ -229,9 +237,9 @@ export default function DataKomoditasPanganView() {
 
           {/* Teknologi/Metode */}
           <div>
-            <Label className="text-sm font-semibold text-gray-700 mb-2">
-              Teknologi/Metode*
-            </Label>
+            <label className="text-sm font-semibold text-gray-700 mb-2">
+              Teknologi/Metode<span className="text-red-500">*</span>
+            </label>
             <Select onValueChange={(value) => setValue("food_technology", value)} value={foodTechnology}>
               <SelectTrigger className={`w-full h-12 rounded-xl ${getFieldError('food_technology')
                   ? 'border-red-500 focus:ring-red-500'
@@ -240,9 +248,11 @@ export default function DataKomoditasPanganView() {
                 <SelectValue placeholder="Pilih Teknologi/Metode" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="konvensional">Konvensional</SelectItem>
-                <SelectItem value="organik">Organik</SelectItem>
-                <SelectItem value="hidroponik">Hidroponik</SelectItem>
+                {TeknologiMethodePangan.map((item) => (
+                  <SelectItem key={item} value={item}>
+                    {item}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
             {getFieldError('food_technology') && (
@@ -252,9 +262,9 @@ export default function DataKomoditasPanganView() {
 
           {/* Tanggal Tanam */}
           <div>
-            <Label className="text-sm font-semibold text-gray-700 mb-2">
-              Tanggal Tanam*
-            </Label>
+            <label className="text-sm font-semibold text-gray-700 mb-2">
+              Tanggal Tanam<span className="text-red-500">*</span>
+            </label>
             <Popover>
               <PopoverTrigger asChild>
                 <Button
@@ -293,9 +303,9 @@ export default function DataKomoditasPanganView() {
 
           {/* Tanggal Perkiraan Panen */}
           <div>
-            <Label className="text-sm font-semibold text-gray-700 mb-2">
-              Tanggal Perkiraan Panen*
-            </Label>
+            <label className="text-sm font-semibold text-gray-700 mb-2">
+              Tanggal Perkiraan Panen<span className="text-red-500">*</span>
+            </label>
             <Popover>
               <PopoverTrigger asChild>
                 <Button
@@ -332,22 +342,24 @@ export default function DataKomoditasPanganView() {
             )}
           </div>
 
-          {/* Keterangan Tanam/Panen */}
+          {/* Keterlambatan Tanam/Panen */}
           <div>
-            <Label className="text-sm font-semibold text-gray-700 mb-2">
-              Keterangan Tanam/Panen*
-            </Label>
+            <label className="text-sm font-semibold text-gray-700 mb-2">
+              Keterlambatan Tanam/Panen<span className="text-red-500">*</span>
+            </label>
             <Select onValueChange={(value) => setValue("food_delay_reason", value)} value={foodDelayReason}>
               <SelectTrigger className={`w-full h-12 rounded-xl ${getFieldError('food_delay_reason')
                   ? 'border-red-500 focus:ring-red-500'
                   : 'border-gray-200 focus:ring-green-500'
                 }`}>
-                <SelectValue placeholder="Pilih Keterangan Tanam/Panen" />
+                <SelectValue placeholder="Pilih Keterlambatan Tanam/Panen" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="normal">Normal</SelectItem>
-                <SelectItem value="terlambat">Terlambat</SelectItem>
-                <SelectItem value="lebih-awal">Lebih Awal</SelectItem>
+                {KeterlambatanTanamPanen.map((item) => (
+                  <SelectItem key={item} value={item}>
+                    {item}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
             {getFieldError('food_delay_reason') && (
@@ -359,9 +371,9 @@ export default function DataKomoditasPanganView() {
         </div>
         {/* Foto Lokasi */}
         <div>
-          <Label className="text-sm font-semibold text-gray-700 mb-4 mt-6">
-            Foto Lokasi*
-          </Label>
+          <label className="text-sm font-semibold text-gray-700 mb-4 mt-6">
+            Foto Lokasi<span className="text-red-500">*</span>
+          </label>
           <ImageUpload
             onFileChange={(file) => setValue("photos", file)}
             error={getErrorMessage('photos')}
@@ -378,9 +390,9 @@ export default function DataKomoditasPanganView() {
         <div className="grid md:grid-cols-2 gap-6">
           {/* Ada Serangan Hama/Penyakit */}
           <div>
-            <Label className="text-sm font-semibold text-gray-700 mb-2">
-              Ada Serangan Hama/Penyakit?*
-            </Label>
+            <label className="text-sm font-semibold text-gray-700 mb-2">
+              Ada Serangan Hama/Penyakit?<span className="text-red-500">*</span>
+            </label>
             <Select onValueChange={(value) => {
               const hasDisease = value === "ya";
               setValue("has_pest_disease", hasDisease, { shouldValidate: true });
@@ -388,7 +400,7 @@ export default function DataKomoditasPanganView() {
               // Clear related fields when "tidak" is selected
               if (!hasDisease) {
                 setValue("pest_disease_type", "");
-                setValue("affected_area", 0);
+                setValue("affected_area", "");
                 setValue("pest_control_action", "");
               }
             }} value={pestDiseaseSelectValue}>
@@ -410,9 +422,9 @@ export default function DataKomoditasPanganView() {
 
           {/* Jenis Hama/Penyakit */}
           <div>
-            <Label className={`text-sm font-semibold mb-2 ${!hasPestDisease ? 'text-gray-400' : 'text-gray-700'}`}>
-              Jenis Hama/Penyakit Dominan*
-            </Label>
+            <label className={`text-sm font-semibold mb-2 ${!hasPestDisease ? 'text-gray-400' : 'text-gray-700'}`}>
+              Jenis Hama/Penyakit Dominan<span className="text-red-500">*</span>
+            </label>
             <Select
               onValueChange={(value) => setValue("pest_disease_type", value)}
               value={pestDiseaseType}
@@ -428,9 +440,11 @@ export default function DataKomoditasPanganView() {
                 <SelectValue placeholder="Pilih Jenis Hama/Penyakit" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="wereng">Wereng</SelectItem>
-                <SelectItem value="tikus">Tikus</SelectItem>
-                <SelectItem value="blast">Blast</SelectItem>
+              {JenisHamaPenyakit.map((item) => (
+                <SelectItem key={item} value={item}>
+                  {item}
+                </SelectItem>
+              ))}
               </SelectContent>
             </Select>
             {getFieldError('pest_disease_type') && hasPestDisease && (
@@ -438,25 +452,33 @@ export default function DataKomoditasPanganView() {
             )}
           </div>
 
-          {/* Luas Serangan Hama */}
+          {/* Luas Serangan Hama -> seharusnya disini adalah select */}
           <div>
-            <Label className={`text-sm font-semibold mb-2 ${!hasPestDisease ? 'text-gray-400' : 'text-gray-700'}`}>
-              Luas Terserang Hama*
-            </Label>
-            <Input
-              type="number"
-              {...register("affected_area", { valueAsNumber: true })}
-              placeholder="Contoh: 10"
-              defaultValue={0}
+            <label className={`text-sm font-semibold mb-2 ${!hasPestDisease ? 'text-gray-400' : 'text-gray-700'}`}>
+              Luas Terserang Hama<span className="text-red-500">*</span>
+            </label>
+            <Select
+              onValueChange={(value) => setValue("affected_area", value)}
+              value={watch("affected_area")}
               disabled={!hasPestDisease}
-              className={`h-12 rounded-xl ${
+            >
+              <SelectTrigger className={`w-full h-12 rounded-xl ${
                 !hasPestDisease
                   ? 'bg-gray-100 text-gray-400 cursor-not-allowed border-gray-200'
                   : getFieldError('affected_area')
                     ? 'border-red-500 focus:ring-red-500'
                     : 'border-gray-200 focus:ring-green-500'
-                }`}
-            />
+                }`}>
+                <SelectValue placeholder="Pilih Luas Terserang Hama" />
+              </SelectTrigger>
+              <SelectContent>
+                {LuastTerdampakHama.map((item) => (
+                  <SelectItem key={item} value={item}>
+                    {item}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
             {getFieldError('affected_area') && hasPestDisease && (
               <p className="text-red-500 text-sm mt-1">{getErrorMessage('affected_area')}</p>
             )}
@@ -464,9 +486,9 @@ export default function DataKomoditasPanganView() {
 
           {/* Tindakan Pengendalian Hama */}
           <div>
-            <Label className={`text-sm font-semibold mb-2 ${!hasPestDisease ? 'text-gray-400' : 'text-gray-700'}`}>
-              Tindakan Pengendalian Hama*
-            </Label>
+            <label className={`text-sm font-semibold mb-2 ${!hasPestDisease ? 'text-gray-400' : 'text-gray-700'}`}>
+              Tindakan Pengendalian Hama<span className="text-red-500">*</span>
+            </label>
             <Select
               onValueChange={(value) => setValue("pest_control_action", value)}
               value={pestControlAction}
@@ -482,9 +504,11 @@ export default function DataKomoditasPanganView() {
                 <SelectValue placeholder="Pilih Tindakan Pengendalian" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="kimia">Pestisida Kimia</SelectItem>
-                <SelectItem value="organik">Pestisida Organik</SelectItem>
-                <SelectItem value="hayati">Pengendalian Hayati</SelectItem>
+                {TindakanPengendalianHama.map((item) => (
+                  <SelectItem key={item} value={item}>
+                    {item}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
             {getFieldError('pest_control_action') && hasPestDisease && (
@@ -494,9 +518,9 @@ export default function DataKomoditasPanganView() {
 
           {/* Cuaca 7 Hari Terakhir */}
           <div>
-            <Label className="text-sm font-semibold text-gray-700 mb-2">
-              Cuaca 7 Hari Terakhir*
-            </Label>
+            <label className="text-sm font-semibold text-gray-700 mb-2">
+              Cuaca 7 Hari Terakhir<span className="text-red-500">*</span>
+            </label>
             <Select onValueChange={(value) => setValue("weather_condition", value)} value={weatherCondition}>
               <SelectTrigger className={`w-full h-12 rounded-xl ${getFieldError('weather_condition')
                   ? 'border-red-500 focus:ring-red-500'
@@ -505,9 +529,11 @@ export default function DataKomoditasPanganView() {
                 <SelectValue placeholder="Pilih Cuaca" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="cerah">Cerah</SelectItem>
-                <SelectItem value="berawan">Berawan</SelectItem>
-                <SelectItem value="hujan">Hujan</SelectItem>
+                {Cuaca7HariTerakhir.map((item) => (
+                  <SelectItem key={item} value={item}>
+                    {item}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
             {getFieldError('weather_condition') && (
@@ -517,9 +543,9 @@ export default function DataKomoditasPanganView() {
 
           {/* Dampak Cuaca */}
           <div>
-            <Label className="text-sm font-semibold text-gray-700 mb-2">
-              Dampak Cuaca*
-            </Label>
+            <label className="text-sm font-semibold text-gray-700 mb-2">
+              Dampak Cuaca<span className="text-red-500">*</span>
+            </label>
             <Select onValueChange={(value) => setValue("weather_impact", value)} value={weatherImpact}>
               <SelectTrigger className={`w-full h-12 rounded-xl ${getFieldError('weather_impact')
                   ? 'border-red-500 focus:ring-red-500'
@@ -528,9 +554,11 @@ export default function DataKomoditasPanganView() {
                 <SelectValue placeholder="Pilih Dampak Cuaca" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="baik">Baik/Normal</SelectItem>
-                <SelectItem value="kekeringan">Kekeringan</SelectItem>
-                <SelectItem value="banjir">Banjir/Tergenang</SelectItem>
+                {DampakCuaca.map((item) => (
+                  <SelectItem key={item} value={item}>
+                    {item}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
             {getFieldError('weather_impact') && (

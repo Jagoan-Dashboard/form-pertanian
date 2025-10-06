@@ -68,7 +68,7 @@ type KomoditasData = PerkebunanData | HortikulturaData | PanganData;
 interface Step3UniversalData {
   has_pest_disease: boolean;
   pest_disease_type?: string;
-  affected_area?: number;
+  affected_area?: string;
   pest_control_action?: string;
   weather_condition?: string;
   weather_impact?: string;

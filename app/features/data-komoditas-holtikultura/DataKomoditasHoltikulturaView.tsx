@@ -513,7 +513,7 @@ export default function DataKomoditasHortikulturaView() {
               // Clear related fields when "tidak" is selected
               if (!hasDisease) {
                 setValue("pest_disease_type", "");
-                setValue("affected_area", 0);
+                setValue("affected_area", "");
                 setValue("pest_control_action", "");
               }
             }} value={pestDiseaseSelectValue}>

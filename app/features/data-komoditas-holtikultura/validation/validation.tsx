@@ -74,7 +74,7 @@ export const dataKomoditasHortikulturaSchema = z.object({
 
   pest_disease_type: z.string().optional(),
 
-  affected_area: z.number().optional(),
+  affected_area: z.string().optional(),
 
   pest_control_action: z.string().optional(),
 

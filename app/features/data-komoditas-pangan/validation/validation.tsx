@@ -48,7 +48,7 @@ export const dataKomoditasPanganSchema = z.object({
     message: "Ada Serangan Hama wajib dipilih"
   }),
   pest_disease_type: z.string().optional(),
-  affected_area: z.number().optional(),
+  affected_area: z.string().optional(),
   pest_control_action: z.string().optional(),
 
   weather_condition: z.string().nonempty("Cuaca 7 Hari wajib dipilih"),

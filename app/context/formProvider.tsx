@@ -57,7 +57,7 @@ export function FormProvider({ children }: { children: React.ReactNode }) {
       suggestions: "",
       
       // Universal fields
-      affected_area: 0,
+      affected_area: "",
       has_pest_disease: false,
       pest_disease_type: "",
       pest_control_action: "",
@@ -142,7 +142,7 @@ export function FormProvider({ children }: { children: React.ReactNode }) {
 
       // Reset form with default values to ensure complete reset
       methods.reset({
-        affected_area: 0,
+        affected_area: "",
         district: "",
       });
 
@@ -159,7 +159,7 @@ export function FormProvider({ children }: { children: React.ReactNode }) {
       );
       // Reset form with default values to ensure complete reset
       methods.reset({
-        affected_area: 0,
+        affected_area: "",
         district: "",
       });
       // Force page refresh after form submission

@@ -59,7 +59,7 @@ export interface FormPertanianData {
   // Step 3 Universal
   has_pest_disease: boolean;
   pest_disease_type?: string;
-  affected_area: number;
+  affected_area: string;
   pest_control_action?: string;
   weather_condition?: string;
   weather_impact?: string;
@@ -154,7 +154,7 @@ export function FormPertanianProvider({
       // Step 3 Universal
       has_pest_disease: false,
       pest_disease_type: '',
-      affected_area: 0,
+      affected_area: '',
       pest_control_action: '',
       weather_condition: '',
       weather_impact: '',
