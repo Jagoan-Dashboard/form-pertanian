@@ -235,7 +235,7 @@ export default function AspirasiTaniView() {
 
           <div>
             <label className="text-sm font-semibold text-gray-700 mb-2">
-              Apa harapan dan saran Bapak/Ibu ke depan agar pertanian lebih baik?*
+              Apa harapan dan saran Bapak/Ibu ke depan agar pertanian lebih baik?
             </label>
             <Textarea
               value={suggestions || ''}
