@@ -33,7 +33,7 @@ export function FormProvider({ children }: { children: React.ReactNode }) {
       farmer_name: "",
       farmer_group: "",
       village: "",
-      district: "Ngawi", // Default value
+      district: "", // Default value
       
       // From data komoditas schemas - Initialize with a default selection to satisfy discriminated union
       komoditas: "pangan", // Default to one of the valid union options to satisfy the schema
@@ -143,7 +143,7 @@ export function FormProvider({ children }: { children: React.ReactNode }) {
       // Reset form with default values to ensure complete reset
       methods.reset({
         affected_area: 0,
-        district: "Ngawi",
+        district: "",
       });
 
       // Force page refresh after form submission
@@ -160,7 +160,7 @@ export function FormProvider({ children }: { children: React.ReactNode }) {
       // Reset form with default values to ensure complete reset
       methods.reset({
         affected_area: 0,
-        district: "Ngawi",
+        district: "",
       });
       // Force page refresh after form submission
       // setTimeout(() => {

@@ -1,4 +1,4 @@
-export const DESAKECAMATAN = [
+export const DesaKecamatan = [
   "Bringin",
   "Geneng",
   "Gerih",

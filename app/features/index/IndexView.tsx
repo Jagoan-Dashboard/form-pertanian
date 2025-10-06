@@ -14,6 +14,7 @@ import { format } from "date-fns";
 import type { FullFormType } from "~/global-validation/validation-step-schemas";
 import { useNavigate } from "react-router";
 import { CalendarIcon } from "lucide-react";
+import { DesaKecamatan } from "~/const/wilayah";
 
 export function IndexView() {
   const { register, formState: { errors }, setValue, getValues, watch, trigger } = useFormContext<FullFormType>();
@@ -166,7 +167,7 @@ export function IndexView() {
           <div className="space-y-4">
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-2">
-                Latitude*
+                Latitude<span className="text-red-500">*</span>
               </label>
               <Input
                 type="text"
@@ -184,7 +185,7 @@ export function IndexView() {
 
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-2">
-                Longitude*
+                Longitude<span className="text-red-500">*</span>
               </label>
               <Input
                 type="text"
@@ -234,7 +235,7 @@ export function IndexView() {
         <div className="grid md:grid-cols-2 gap-6">
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-2">
-              Nama Penyuluh*
+              Nama Penyuluh<span className="text-red-500">*</span>
             </label>
             <Input
               type="text"
@@ -252,7 +253,7 @@ export function IndexView() {
 
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-2">
-              Tanggal Kunjungan*
+              Tanggal Kunjungan<span className="text-red-500">*</span>
             </label>
             <Popover>
               <PopoverTrigger asChild>
@@ -292,7 +293,7 @@ export function IndexView() {
 
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-2">
-              Nama Petani*
+              Nama Petani<span className="text-red-500">*</span>
             </label>
             <Input
               type="text"
@@ -313,7 +314,7 @@ export function IndexView() {
 
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-2">
-              Nama Kelompok Tani*
+              Nama Kelompok Tani<span className="text-red-500">*</span>
             </label>
             <Input
               type="text"
@@ -330,26 +331,33 @@ export function IndexView() {
           </div>
 
         </div>
-          <div>
-            <label className="block mt-5 text-sm font-semibold text-gray-700 mb-2">
-              Desa*
-            </label>
-            <Select value={village} onValueChange={(value) => setValue('village', value, { shouldValidate: true })}>
-              <SelectTrigger className={`w-full px-4 py-3 rounded-xl focus:ring-2 focus:border-transparent transition-all appearance-none bg-white ${errors.village
-                ? 'border-red-500 focus:ring-red-500'
-                : 'border-gray-200 focus:ring-green-500'
-                }`}>
-                <SelectValue placeholder="Pilih Desa" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="desa-a">Desa A</SelectItem>
-                <SelectItem value="desa-b">Desa B</SelectItem>
-              </SelectContent>
-            </Select>
-            {errors.village && (
-              <p className="text-red-500 text-sm mt-1">{errors.village?.message?.toString()}</p>
-            )}
-          </div>
+        <div>
+          <label className="block mt-5 text-sm font-semibold text-gray-700 mb-2">
+            Desa/Kecamatan<span className="text-red-500">*</span>
+          </label>
+          <Select
+            value={village}
+            onValueChange={(value) => {
+              setValue('village', value, { shouldValidate: true });
+              setValue('district', value, { shouldValidate: true });
+            }}
+          >
+            <SelectTrigger className={`w-full px-4 py-3 rounded-xl focus:ring-2 focus:border-transparent transition-all appearance-none bg-white ${errors.village ? 'border-red-500 focus:ring-red-500' : 'border-gray-200 focus:ring-green-500'
+              }`}>
+              <SelectValue placeholder="Pilih Desa" />
+            </SelectTrigger>
+            <SelectContent>
+              {DesaKecamatan.map((item) => (
+                <SelectItem key={item} value={item}>
+                  {item}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          {errors.village && (
+            <p className="text-red-500 text-sm mt-1">{errors.village?.message?.toString()}</p>
+          )}
+        </div>
 
         <div className="mt-8 flex w-full justify-end ">
           <Button
