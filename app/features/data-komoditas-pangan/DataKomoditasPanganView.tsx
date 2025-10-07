@@ -14,7 +14,7 @@ import { ImageUpload } from "~/components/ImageUplaod";
 import { useFormContext } from "react-hook-form";
 import type { FullFormType } from "~/global-validation/validation-step-schemas";
 import { FasePertumbuhanPangan, KeterlambatanTanamPanen, KomoditasPanganYangDitanam, StatusLahan, TeknologiMethodePangan } from "~/const/komoditas";
-import { Cuaca7HariTerakhir, DampakCuaca, JenisHamaPenyakit, LuastTerdampakHama, TindakanPengendalianHama } from "~/const/hama_penyakit_cuaca";
+import { Cuaca7HariTerakhir, DampakCuaca, JenisHamaPenyakitPangan, LuastTerdampakHama, TindakanPengendalianHamaPangan } from "~/const/hama_penyakit_cuaca";
 import { ConfirmationDialog } from "~/components/ConfirmationDialog";
 
 export default function DataKomoditasPanganView() {
@@ -483,7 +483,7 @@ export default function DataKomoditasPanganView() {
                 <SelectValue placeholder="Pilih Jenis Hama/Penyakit" />
               </SelectTrigger>
               <SelectContent>
-              {JenisHamaPenyakit.map((item) => (
+              {JenisHamaPenyakitPangan.map((item) => (
                 <SelectItem key={item} value={item}>
                   {item}
                 </SelectItem>
@@ -547,7 +547,7 @@ export default function DataKomoditasPanganView() {
                 <SelectValue placeholder="Pilih Tindakan Pengendalian" />
               </SelectTrigger>
               <SelectContent>
-                {TindakanPengendalianHama.map((item) => (
+                {TindakanPengendalianHamaPangan.map((item) => (
                   <SelectItem key={item} value={item}>
                     {item}
                   </SelectItem>

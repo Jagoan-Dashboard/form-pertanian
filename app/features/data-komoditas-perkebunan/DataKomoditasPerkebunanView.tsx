@@ -14,7 +14,7 @@ import { ImageUpload } from "~/components/ImageUplaod";
 import { useFormContext, type FieldPath } from "react-hook-form";
 import type { FullFormType } from "~/global-validation/validation-step-schemas";
 import { FasePertumbuhanPerkebunan, KeterlambatanTanamPanen, KomoditasPerkebunanYangDitanam, MasalahProduksiPerkebunan, StatusLahan, TeknologiMethodePerkebunan } from "~/const/komoditas";
-import { Cuaca7HariTerakhir, DampakCuaca, JenisHamaPenyakit, LuastTerdampakHama } from "~/const/hama_penyakit_cuaca";
+import { Cuaca7HariTerakhir, DampakCuaca, JenisHamaPenyakitPerkebunan, LuastTerdampakHama, TindakanPengendalianHamaPerkebunan } from "~/const/hama_penyakit_cuaca";
 import { ConfirmationDialog } from "~/components/ConfirmationDialog";
 
 export default function DataKomoditasPerkebunanView() {
@@ -509,7 +509,7 @@ export default function DataKomoditasPerkebunanView() {
                 <SelectValue placeholder="Pilih Jenis Hama/Penyakit" />
               </SelectTrigger>
               <SelectContent>
-                {JenisHamaPenyakit.map((item) => (
+                {JenisHamaPenyakitPerkebunan.map((item) => (
                   <SelectItem key={item} value={item}>
                     {item}
                   </SelectItem>
@@ -571,9 +571,11 @@ export default function DataKomoditasPerkebunanView() {
                 <SelectValue placeholder="Pilih Tindakan Pengendalian" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="kimia">Pestisida Kimia</SelectItem>
-                <SelectItem value="organik">Pestisida Organik</SelectItem>
-                <SelectItem value="hayati">Pengendalian Hayati</SelectItem>
+                {TindakanPengendalianHamaPerkebunan.map((item) => (
+                  <SelectItem key={item} value={item}>
+                    {item}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
             {getFieldError('pest_control_action') && adaSeranganHama && (

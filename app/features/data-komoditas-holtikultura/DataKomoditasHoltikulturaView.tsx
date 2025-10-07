@@ -13,7 +13,7 @@ import { ImageUpload } from "~/components/ImageUplaod";
 import { useFormContext, type FieldPath } from "react-hook-form";
 import type { FullFormType } from "~/global-validation/validation-step-schemas";
 import { FasePertumbuhanHortikultura, JenisHortiYangDitanam, KeterlambatanTanamPanen, KomoditasHortiYangDitanamSayuran, KomoditasHortiYangDitanamBuah, MasalahPascaPanenHortikultur, StatusLahan, TeknologiMethodeHortikultur, KomoditasHortiYangDitanamFlorikultura } from "~/const/komoditas";
-import { Cuaca7HariTerakhir, DampakCuaca, JenisHamaPenyakit, LuastTerdampakHama, TindakanPengendalianHama } from "~/const/hama_penyakit_cuaca";
+import { Cuaca7HariTerakhir, DampakCuaca, JenisHamaPenyakitHorti, LuastTerdampakHama, TindakanPengendalianHamaHorti } from "~/const/hama_penyakit_cuaca";
 import { ConfirmationDialog } from "~/components/ConfirmationDialog";
 
 export default function DataKomoditasHortikulturaView() {
@@ -579,7 +579,7 @@ export default function DataKomoditasHortikulturaView() {
                 <SelectValue placeholder="Pilih Jenis Hama/Penyakit" />
               </SelectTrigger>
               <SelectContent>
-                {JenisHamaPenyakit.map((item) => (
+                {JenisHamaPenyakitHorti.map((item) => (
                   <SelectItem key={item} value={item}>
                     {item}
                   </SelectItem>
@@ -641,7 +641,7 @@ export default function DataKomoditasHortikulturaView() {
                 <SelectValue placeholder="Pilih Tindakan Pengendalian" />
               </SelectTrigger>
               <SelectContent>
-                {TindakanPengendalianHama.map((item) => (
+                {TindakanPengendalianHamaHorti.map((item) => (
                   <SelectItem key={item} value={item}>
                     {item}
                   </SelectItem>
