@@ -34,7 +34,7 @@ export function FormProvider({ children }: { children: React.ReactNode }) {
       farmer_group: "",
       village: "",
       district: "", // Default value
-      
+
       // From data komoditas schemas - Initialize with a default selection to satisfy discriminated union
       komoditas: "pangan", // Default to one of the valid union options to satisfy the schema
       // Only include fields that are part of the pangan schema to satisfy the discriminated union
@@ -47,7 +47,7 @@ export function FormProvider({ children }: { children: React.ReactNode }) {
       food_planting_date: "",
       food_harvest_date: "",
       food_delay_reason: "",
-      
+
       // From aspirasiTaniSchema (Step 4)
       main_constraint: "",
       farmer_hope: "",
@@ -55,7 +55,7 @@ export function FormProvider({ children }: { children: React.ReactNode }) {
       urgent_needs: "",
       water_access: "",
       suggestions: "",
-      
+
       // Universal fields
       affected_area: "",
       has_pest_disease: false,
@@ -63,7 +63,7 @@ export function FormProvider({ children }: { children: React.ReactNode }) {
       pest_control_action: "",
       weather_condition: "",
       weather_impact: "",
-      
+
       // Photos
       photos: null,
     };
@@ -102,7 +102,7 @@ export function FormProvider({ children }: { children: React.ReactNode }) {
         console.error("Failed to save form data to localStorage:", error);
       }
     });
-    
+
     return () => subscription.unsubscribe();
   }, [methods]);
 
@@ -142,8 +142,6 @@ export function FormProvider({ children }: { children: React.ReactNode }) {
 
       // Reset form with default values to ensure complete reset
       methods.reset({
-        affected_area: "",
-        district: "",
       });
       localStorage.removeItem("komoditas");
 
@@ -160,9 +158,9 @@ export function FormProvider({ children }: { children: React.ReactNode }) {
       );
       // Reset form with default values to ensure complete reset
       methods.reset({
-        affected_area: "",
-        district: "",
       });
+      localStorage.removeItem("komoditas");
+
       // Force page refresh after form submission
       // setTimeout(() => {
       //   window.location.href = "/";

@@ -5,7 +5,7 @@ import { Label } from "~/components/ui/label";
 import { Textarea } from "~/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "~/components/ui/select";
 import { useNavigate } from "react-router";
-import { SuccessAlert } from "~/components/SuccesAlert";
+import { SuccessAlert } from "~/components/SuccessAlert";
 import { checkFieldConsistency, getCharacterCount } from "./validation/validation";
 import { useFormContext } from "react-hook-form";
 import { useFormContextHook } from "~/context/formProvider";

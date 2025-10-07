@@ -1,9 +1,5 @@
-import { useState, useEffect } from "react";
 import { Icon } from "@iconify/react";
 import { Button } from "~/components/ui/button";
-import { Label } from "~/components/ui/label";
-import { Textarea } from "~/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "~/components/ui/select";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "~/components/ui/dialog";
 import { useNavigate } from "react-router";
 
@@ -12,22 +8,23 @@ export function SuccessAlert({
   open, 
   onClose,
   title = "Berhasil!",
-  description = "Terima kasih. Jawaban Anda sudah terkirim!"
+  description = "Terima kasih. Jawaban Anda sudah terkirim!",
 }: {
   open: boolean;
   onClose: () => void;
   title?: string;
   description?: string;
 }) {
-  useEffect(() => {
-    let timer: NodeJS.Timeout;
-    if (open) {
-      timer = setTimeout(() => {
-        onClose();
-      }, 1500);
-    }
-    return () => clearTimeout(timer);
-  }, [open, onClose]);
+  const navigate = useNavigate();
+
+  const handleClose = () => {
+    
+    // Navigate to home page
+    navigate('/', { replace: true });
+    
+    // Call the original onClose if provided
+    onClose();
+  };
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
@@ -42,12 +39,13 @@ export function SuccessAlert({
           <DialogDescription className="text-base text-gray-600 text-center">
             {description}
           </DialogDescription>
+          
         </DialogHeader>
         <Button
-          onClick={onClose}
+          onClick={handleClose}
           className="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-6 rounded-xl text-lg mt-4"
         >
-          Done
+          Selesai, Kembali ke awal
         </Button>
       </DialogContent>
     </Dialog>
