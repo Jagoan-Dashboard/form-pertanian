@@ -413,7 +413,7 @@ export default function DataKomoditasPanganView() {
 
         </div>
         {/* Foto Lokasi */}
-        <div>
+        <div className="mt-6">
           <label className="text-sm font-semibold text-gray-700 mb-4 mt-6">
             Foto Lokasi<span className="text-red-500">*</span>
           </label>
