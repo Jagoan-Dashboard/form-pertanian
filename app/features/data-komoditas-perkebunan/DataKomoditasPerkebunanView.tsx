@@ -501,10 +501,12 @@ export default function DataKomoditasPerkebunanView() {
             <label className="text-sm font-semibold text-gray-700 mb-2">
               Jenis Hama/Penyakit Dominan<span className="text-red-500">*</span>
             </label>
-            <Select value={jenisHamaPenyakit} onValueChange={(value) => setValue("pest_disease_type", value)}>
-              <SelectTrigger className={`w-full h-12 rounded-xl ${getFieldError('pest_disease_type')
-                ? 'border-red-500 focus:ring-red-500'
-                : 'border-gray-200 focus:ring-green-500'
+            <Select disabled={!adaSeranganHama} value={jenisHamaPenyakit} onValueChange={(value) => setValue("pest_disease_type", value)}>
+              <SelectTrigger className={`w-full h-12 rounded-xl ${!adaSeranganHama
+                ? 'bg-gray-100 text-gray-400 cursor-not-allowed border-gray-200'
+                : getFieldError('pest_disease_type')
+                  ? 'border-red-500 focus:ring-red-500'
+                  : 'border-gray-200 focus:ring-green-500'
                 }`}>
                 <SelectValue placeholder="Pilih Jenis Hama/Penyakit" />
               </SelectTrigger>
