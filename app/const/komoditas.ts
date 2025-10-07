@@ -54,7 +54,7 @@ export const JenisHortiYangDitanam = [
   "Buah",
   "Florikultura"
 ]
-export const KomoditasHortiYangDitanam = [
+export const KomoditasHortiYangDitanamSayuran = [
   "Bawang Merah",
   "Bawang Putih",
   "Tomat",
@@ -64,6 +64,24 @@ export const KomoditasHortiYangDitanam = [
   "Sawi",
   "Lainnya"
 ]
+export const KomoditasHortiYangDitanamBuah=[
+ "Pisang",
+ "Mangga",
+ "Jeruk",
+ "Semangka",
+ "Melon",
+ "Pepaya",
+ "Nanas",
+ "Durian",
+ "Lainnya"
+]
+export const KomoditasHortiYangDitanamFlorikultura=[
+ "Anggrek",
+ "Krisan",
+ "Mawar",
+ "Lainnya"
+]
+
 export const FasePertumbuhanHortikultura=[
   "Persemaian",
   "Vegetatif",

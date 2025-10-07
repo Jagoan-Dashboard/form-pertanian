@@ -1,11 +1,10 @@
-import React, { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { CalendarIcon } from "lucide-react";
 import { useNavigate } from "react-router";
 import { Button } from "~/components/ui/button";
 import { Calendar } from "~/components/ui/calendar";
 import { Input } from "~/components/ui/input";
 import { id as idLocale } from "date-fns/locale/id";
-import { Label } from "~/components/ui/label";
 import { Popover, PopoverContent, PopoverTrigger } from "~/components/ui/popover";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "~/components/ui/select";
 import { cn } from "~/lib/utils";
@@ -13,7 +12,7 @@ import { Icon } from "@iconify/react";
 import { ImageUpload } from "~/components/ImageUplaod";
 import { useFormContext, type FieldPath } from "react-hook-form";
 import type { FullFormType } from "~/global-validation/validation-step-schemas";
-import { FasePertumbuhanHortikultura, JenisHortiYangDitanam, KeterlambatanTanamPanen, KomoditasHortiYangDitanam, MasalahPascaPanenHortikultur, StatusLahan, TeknologiMethodeHortikultur } from "~/const/komoditas";
+import { FasePertumbuhanHortikultura, JenisHortiYangDitanam, KeterlambatanTanamPanen, KomoditasHortiYangDitanamSayuran, KomoditasHortiYangDitanamBuah, MasalahPascaPanenHortikultur, StatusLahan, TeknologiMethodeHortikultur, KomoditasHortiYangDitanamFlorikultura } from "~/const/komoditas";
 import { Cuaca7HariTerakhir, DampakCuaca, JenisHamaPenyakit, LuastTerdampakHama, TindakanPengendalianHama } from "~/const/hama_penyakit_cuaca";
 import { ConfirmationDialog } from "~/components/ConfirmationDialog";
 
@@ -242,7 +241,17 @@ export default function DataKomoditasHortikulturaView() {
                 <SelectValue placeholder="Pilih Komoditas Hortikultura" />
               </SelectTrigger>
               <SelectContent>
-                {KomoditasHortiYangDitanam.map((item) => (
+                {jenisHortikultura === "Sayuran" && KomoditasHortiYangDitanamSayuran.map((item) => (
+                  <SelectItem key={item} value={item}>
+                    {item}
+                  </SelectItem>
+                ))}
+                {jenisHortikultura === "Buah" && KomoditasHortiYangDitanamBuah.map((item) => (
+                  <SelectItem key={item} value={item}>
+                    {item}
+                  </SelectItem>
+                ))}
+                {jenisHortikultura === "Florikultura" && KomoditasHortiYangDitanamFlorikultura.map((item) => (
                   <SelectItem key={item} value={item}>
                     {item}
                   </SelectItem>
