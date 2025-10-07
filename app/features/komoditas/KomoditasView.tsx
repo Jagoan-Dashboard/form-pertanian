@@ -23,6 +23,7 @@ export default function KomoditasView() {
 
   const handleSelect = (id: "pangan" | "hortikultura" | "perkebunan") => {
     setValue("selectedKomoditas", id, { shouldValidate: true });
+    setValue("komoditas", id, { shouldValidate: true }); // Also set the komoditas field for validation
 
     // Reset other komoditas data
     if (id === "pangan") {

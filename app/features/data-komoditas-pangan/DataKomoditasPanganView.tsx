@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
@@ -15,10 +15,12 @@ import { useFormContext } from "react-hook-form";
 import type { FullFormType } from "~/global-validation/validation-step-schemas";
 import { FasePertumbuhanPangan, KeterlambatanTanamPanen, KomoditasPanganYangDitanam, StatusLahan, TeknologiMethodePangan } from "~/const/komoditas";
 import { Cuaca7HariTerakhir, DampakCuaca, JenisHamaPenyakit, LuastTerdampakHama, TindakanPengendalianHama } from "~/const/hama_penyakit_cuaca";
+import { ConfirmationDialog } from "~/components/ConfirmationDialog";
 
 export default function DataKomoditasPanganView() {
-  const { register, formState: { errors }, setValue, getValues, watch, trigger } = useFormContext<FullFormType>();
+  const { register, formState: { errors }, setValue, getValues, watch, trigger, reset } = useFormContext<FullFormType>();
   const navigate = useNavigate();
+  const [showBackDialog, setShowBackDialog] = useState(false);
 
   // Set komoditas value and ensure has_pest_disease initial state when component mounts
   React.useEffect(() => {
@@ -30,6 +32,47 @@ export default function DataKomoditasPanganView() {
       setValue("has_pest_disease", false);
     }
   }, [setValue, getValues]);
+
+  // Function to clear pangan-specific data
+  const clearPanganData = () => {
+    // Clear pangan-specific fields
+    setValue("food_commodity", "");
+    setValue("food_land_status", "");
+    setValue("food_land_area", 0);
+    setValue("food_growth_phase", "");
+    setValue("food_plant_age", 0);
+    setValue("food_technology", "");
+    setValue("food_planting_date", "");
+    setValue("food_harvest_date", "");
+    setValue("food_delay_reason", "");
+    
+    // Clear pest/disease fields
+    setValue("has_pest_disease", false);
+    setValue("pest_disease_type", "");
+    setValue("affected_area", "");
+    setValue("pest_control_action", "");
+    
+    // Clear weather fields
+    setValue("weather_condition", "");
+    setValue("weather_impact", "");
+    
+    // Clear photos
+    setValue("photos", null);
+    
+    // Clear localStorage data if any
+    localStorage.removeItem("panganFormData");
+  };
+
+  // Handler for back button with confirmation
+  const handleBackWithConfirmation = () => {
+    setShowBackDialog(true);
+  };
+
+  // Handler for confirming back navigation
+  const handleConfirmBack = () => {
+    clearPanganData();
+    navigate("/komoditas");
+  };
 
   // Type guard for pangan-specific errors
   const getFieldError = (fieldName: string) => {
@@ -571,7 +614,7 @@ export default function DataKomoditasPanganView() {
       {/* Action Buttons */}
       <div className="flex flex-col sm:flex-row justify-end gap-3 bg-white rounded-3xl shadow-sm border border-gray-100 p-6 md:p-8">
         <Button
-          onClick={() => navigate("/komoditas")}
+          onClick={handleBackWithConfirmation}
           variant="outline"
           className="sm:w-auto w-full hover:border-green-600 cursor-pointer hover:text-green-600 border-green-600 text-green-600 hover:bg-green-50 font-semibold py-6 px-10 rounded-xl transition-all duration-200"
         >
@@ -585,6 +628,18 @@ export default function DataKomoditasPanganView() {
           <Icon icon="material-symbols:chevron-right" className="w-5 h-5" />
         </Button>
       </div>
+
+      {/* Confirmation Dialog */}
+      <ConfirmationDialog
+        isOpen={showBackDialog}
+        onClose={() => setShowBackDialog(false)}
+        variant="danger"
+        onConfirm={handleConfirmBack}
+        title="Konfirmasi Kembali"
+        description="Anda yakin ingin kembali? Data yang telah diisi di Komoditas Pangan akan dihapus."
+        confirmText="Ya, Kembali"
+        cancelText="Batal"
+      />
     </div>
   );
 }

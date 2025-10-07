@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { CalendarIcon } from "lucide-react";
 import { useNavigate } from "react-router";
 import { Button } from "~/components/ui/button";
@@ -15,10 +15,12 @@ import { useFormContext, type FieldPath } from "react-hook-form";
 import type { FullFormType } from "~/global-validation/validation-step-schemas";
 import { FasePertumbuhanHortikultura, JenisHortiYangDitanam, KeterlambatanTanamPanen, KomoditasHortiYangDitanam, MasalahPascaPanenHortikultur, StatusLahan, TeknologiMethodeHortikultur } from "~/const/komoditas";
 import { Cuaca7HariTerakhir, DampakCuaca, JenisHamaPenyakit, LuastTerdampakHama, TindakanPengendalianHama } from "~/const/hama_penyakit_cuaca";
+import { ConfirmationDialog } from "~/components/ConfirmationDialog";
 
 export default function DataKomoditasHortikulturaView() {
-  const { register, formState: { errors }, setValue, getValues, watch, trigger } = useFormContext<FullFormType>();
+  const { register, formState: { errors }, setValue, getValues, watch, trigger, reset } = useFormContext<FullFormType>();
   const navigate = useNavigate();
+  const [showBackDialog, setShowBackDialog] = useState(false);
 
   // Set komoditas value and ensure has_pest_disease initial state when component mounts
   useEffect(() => {
@@ -30,6 +32,49 @@ export default function DataKomoditasHortikulturaView() {
       setValue("has_pest_disease", false);
     }
   }, [setValue, getValues]);
+
+  // Function to clear hortikultura-specific data
+  const clearHortikulturaData = () => {
+    // Clear hortikultura-specific fields
+    setValue("horti_commodity", "");
+    setValue("horti_sub_commodity", "");
+    setValue("horti_land_status", "");
+    setValue("horti_land_area", 0);
+    setValue("horti_growth_phase", "");
+    setValue("horti_plant_age", 0);
+    setValue("horti_technology", "");
+    setValue("horti_planting_date", "");
+    setValue("horti_harvest_date", "");
+    setValue("horti_delay_reason", "");
+    setValue("post_harvest_problems", "");
+    
+    // Clear pest/disease fields
+    setValue("has_pest_disease", false);
+    setValue("pest_disease_type", "");
+    setValue("affected_area", "");
+    setValue("pest_control_action", "");
+    
+    // Clear weather fields
+    setValue("weather_condition", "");
+    setValue("weather_impact", "");
+    
+    // Clear photos
+    setValue("photos", null);
+    
+    // Clear localStorage data if any
+    localStorage.removeItem("hortikulturaFormData");
+  };
+
+  // Handler for back button with confirmation
+  const handleBackWithConfirmation = () => {
+    setShowBackDialog(true);
+  };
+
+  // Handler for confirming back navigation
+  const handleConfirmBack = () => {
+    clearHortikulturaData();
+    navigate("/komoditas");
+  };
 
   // Type guard for hortikultura-specific errors
   const getFieldError = (fieldName: string) => {
@@ -655,7 +700,7 @@ export default function DataKomoditasHortikulturaView() {
       {/* Action Buttons */}
       <div className="flex flex-col sm:flex-row justify-end gap-3 bg-white rounded-3xl shadow-sm border border-gray-100 p-6 md:p-8">
         <Button
-          onClick={() => navigate("/komoditas")}
+          onClick={handleBackWithConfirmation}
           variant="outline"
           className="sm:w-auto w-full hover:border-green-600 cursor-pointer hover:text-green-600 border-green-600 text-green-600 hover:bg-green-50 font-semibold py-6 px-10 rounded-xl transition-all duration-200"
         >
@@ -669,6 +714,18 @@ export default function DataKomoditasHortikulturaView() {
           <Icon icon="material-symbols:chevron-right" className="w-5 h-5" />
         </Button>
       </div>
+
+      {/* Confirmation Dialog */}
+      <ConfirmationDialog
+        isOpen={showBackDialog}
+        onClose={() => setShowBackDialog(false)}
+        variant="danger"
+        onConfirm={handleConfirmBack}
+        title="Konfirmasi Kembali"
+        description="Anda yakin ingin kembali? Data yang telah diisi di Komoditas Hortikultura akan dihapus."
+        confirmText="Ya, Kembali"
+        cancelText="Batal"
+      />
     </div>
   );
 }

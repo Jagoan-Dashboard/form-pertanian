@@ -344,7 +344,7 @@ export function IndexView() {
           >
             <SelectTrigger className={`w-full px-4 py-3 rounded-xl focus:ring-2 focus:border-transparent transition-all appearance-none bg-white ${errors.village ? 'border-red-500 focus:ring-red-500' : 'border-gray-200 focus:ring-green-500'
               }`}>
-              <SelectValue placeholder="Pilih Desa" />
+              <SelectValue placeholder="Pilih Desa/Kecamatan" />
             </SelectTrigger>
             <SelectContent>
               {DesaKecamatan.map((item) => (

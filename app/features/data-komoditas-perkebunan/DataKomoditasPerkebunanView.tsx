@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { CalendarIcon } from "lucide-react";
 import { useNavigate } from "react-router";
 import { Button } from "~/components/ui/button";
@@ -15,10 +15,12 @@ import { useFormContext, type FieldPath } from "react-hook-form";
 import type { FullFormType } from "~/global-validation/validation-step-schemas";
 import { FasePertumbuhanPerkebunan, KeterlambatanTanamPanen, KomoditasPerkebunanYangDitanam, MasalahProduksiPerkebunan, StatusLahan, TeknologiMethodePerkebunan } from "~/const/komoditas";
 import { Cuaca7HariTerakhir, DampakCuaca, JenisHamaPenyakit, LuastTerdampakHama } from "~/const/hama_penyakit_cuaca";
+import { ConfirmationDialog } from "~/components/ConfirmationDialog";
 
 export default function DataKomoditasPerkebunanView() {
-  const { register, formState: { errors }, setValue, getValues, watch, trigger } = useFormContext<FullFormType>();
+  const { register, formState: { errors }, setValue, getValues, watch, trigger, reset } = useFormContext<FullFormType>();
   const navigate = useNavigate();
+  const [showBackDialog, setShowBackDialog] = useState(false);
 
   // Set komoditas value and ensure has_pest_disease initial state when component mounts
   useEffect(() => {
@@ -30,6 +32,47 @@ export default function DataKomoditasPerkebunanView() {
       setValue("has_pest_disease", false);
     }
   }, [setValue, getValues]);
+
+  // Function to clear perkebunan-specific data
+  const clearPerkebunanData = () => {
+    // Clear perkebunan-specific fields
+    setValue("plantation_commodity", "");
+    setValue("plantation_land_status", "");
+    setValue("plantation_land_area", 0);
+    setValue("plantation_growth_phase", "");
+    setValue("plantation_plant_age", 0);
+    setValue("plantation_technology", "");
+    setValue("plantation_planting_date", "");
+    setValue("plantation_harvest_date", "");
+    setValue("plantation_delay_reason", "");
+    setValue("production_problems", "");
+    
+    // Clear pest/disease fields
+    setValue("has_pest_disease", false);
+    setValue("pest_disease_type", "");
+    setValue("affected_area", "");
+    
+    // Clear weather fields
+    setValue("weather_condition", "");
+    setValue("weather_impact", "");
+    
+    // Clear photos
+    setValue("photos", null);
+    
+    // Clear localStorage data if any
+    localStorage.removeItem("perkebunanFormData");
+  };
+
+  // Handler for back button with confirmation
+  const handleBackWithConfirmation = () => {
+    setShowBackDialog(true);
+  };
+
+  // Handler for confirming back navigation
+  const handleConfirmBack = () => {
+    clearPerkebunanData();
+    navigate("/komoditas");
+  };
 
   // Type guard for perkebunan-specific errors
   const getFieldError = (fieldName: string) => {
@@ -593,7 +636,7 @@ export default function DataKomoditasPerkebunanView() {
       {/* Action Buttons */}
       <div className="flex flex-col sm:flex-row justify-end gap-3 bg-white rounded-3xl shadow-sm border border-gray-100 p-6 md:p-8">
         <Button
-          onClick={() => navigate("/komoditas")}
+          onClick={handleBackWithConfirmation}
           variant="outline"
           className="sm:w-auto w-full hover:border-green-600 cursor-pointer hover:text-green-600 border-green-600 text-green-600 hover:bg-green-50 font-semibold py-6 px-10 rounded-xl transition-all duration-200"
         >
@@ -607,6 +650,18 @@ export default function DataKomoditasPerkebunanView() {
           <Icon icon="material-symbols:chevron-right" className="w-5 h-5" />
         </Button>
       </div>
+
+      {/* Confirmation Dialog */}
+      <ConfirmationDialog
+        isOpen={showBackDialog}
+        onClose={() => setShowBackDialog(false)}
+        variant="danger"
+        onConfirm={handleConfirmBack}
+        title="Konfirmasi Kembali"
+        description="Anda yakin ingin kembali? Data yang telah diisi di Komoditas Perkebunan akan dihapus."
+        confirmText="Ya, Kembali"
+        cancelText="Batal"
+      />
     </div>
   );
 }

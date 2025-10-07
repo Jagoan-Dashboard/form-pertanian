@@ -1,6 +1,6 @@
 import { IndexView } from "~/features/index/IndexView";
 import type { Route } from "./+types/index";
-
+import { useStepValidation } from "~/hooks/useStepValidation";
 
 export function meta({ }: Route.MetaArgs) {
   return [
@@ -10,6 +10,8 @@ export function meta({ }: Route.MetaArgs) {
 }
 
 export default function Index() {
+  useStepValidation(1); // This is step 1 (Data Penyuluh)
+  
   return (
     <IndexView />
   );
