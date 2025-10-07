@@ -145,6 +145,7 @@ export function FormProvider({ children }: { children: React.ReactNode }) {
         affected_area: "",
         district: "",
       });
+      localStorage.removeItem("komoditas");
 
       // Force page refresh after form submission
       // setTimeout(() => {

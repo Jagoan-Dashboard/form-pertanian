@@ -25,6 +25,9 @@ export default function KomoditasView() {
     setValue("selectedKomoditas", id, { shouldValidate: true });
     setValue("komoditas", id, { shouldValidate: true }); // Also set the komoditas field for validation
 
+    // Store selected commodity type in localStorage
+    localStorage.setItem("komoditas", id);
+
     // Reset other komoditas data
     if (id === "pangan") {
       setValue("horti_commodity", undefined);
@@ -40,7 +43,9 @@ export default function KomoditasView() {
 
   const handleNext = async () => {
     const isValid = await trigger("selectedKomoditas");
-    if (isValid) {
+    if (isValid && selectedKomoditas) {
+      // Ensure the selected commodity is stored in localStorage before navigating
+      localStorage.setItem("komoditas", selectedKomoditas);
       const selected = komoditasList.find(k => k.id === selectedKomoditas);
       if (selected) navigate(selected.navigate);
     }
