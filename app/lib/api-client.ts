@@ -1,9 +1,8 @@
 // src/service/app-service.ts
 import axios from "axios";
-// env
 
 export const apiClient = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000s",
+  baseURL: import.meta.env.VITE_API_BASE_URL || "http://localhost:3000",
   timeout: 10000,
   headers: {
     "Content-Type": "application/json",
