@@ -333,7 +333,7 @@ export default function DataKomoditasPanganView() {
                 <Calendar
                   mode="single"
                   selected={dateTanam ? new Date(dateTanam) : undefined}
-                  onSelect={(date) => setValue("food_planting_date", date?.toISOString() || "")}
+                  onSelect={(date) => setValue("food_planting_date", date ? new Date(date.getTime() - date.getTimezoneOffset() * 60000).toISOString().split('T')[0] : "")}
                   locale={idLocale}
                   className="rounded-2xl"
                 />
@@ -374,7 +374,7 @@ export default function DataKomoditasPanganView() {
                 <Calendar
                   mode="single"
                   selected={datePerkiraanPanen ? new Date(datePerkiraanPanen) : undefined}
-                  onSelect={(date) => setValue("food_harvest_date", date?.toISOString() || "")}
+                  onSelect={(date) => setValue("food_harvest_date", date ? new Date(date.getTime() - date.getTimezoneOffset() * 60000).toISOString().split('T')[0] : "")}
                   locale={idLocale}
                   className="rounded-2xl"
                 />

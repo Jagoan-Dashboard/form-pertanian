@@ -113,7 +113,9 @@ export function FormProvider({ children }: { children: React.ReactNode }) {
       const formatDate = (value?: string | Date) => {
         if (!value) return "";
         const d = new Date(value);
-        return isNaN(d.getTime()) ? "" : d.toISOString().split("T")[0];
+        if (isNaN(d.getTime())) return "";
+        // Convert to local date to avoid timezone issues
+        return new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().split("T")[0];
       };
 
       Object.entries(methods.watch()).forEach(([key, value]) => {

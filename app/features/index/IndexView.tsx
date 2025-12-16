@@ -29,7 +29,7 @@ export function IndexView() {
   // Handle date selection
   const handleDateChange = (date: Date | undefined) => {
     if (date) {
-      setValue('visit_date', date.toISOString(), { shouldValidate: true });
+      setValue('visit_date', new Date(date.getTime() - date.getTimezoneOffset() * 60000).toISOString().split('T')[0], { shouldValidate: true });
     }
   };
 
